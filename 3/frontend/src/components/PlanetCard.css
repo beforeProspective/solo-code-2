@@ -1,0 +1,120 @@
+.planet-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  position: relative;
+}
+
+.planet-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(0, 212, 255, 0.5);
+  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+}
+
+.planet-card.selected {
+  border-color: var(--neon-purple);
+  box-shadow: 0 0 40px rgba(179, 71, 255, 0.4);
+}
+
+.planet-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 160px;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.planet-glow {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  filter: blur(30px);
+  opacity: 0.5;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.planet-glow.orange-400 { background: #fb923c; }
+.planet-glow.yellow-500 { background: #eab308; }
+.planet-glow.blue-400 { background: #60a5fa; }
+.planet-glow.red-500 { background: #ef4444; }
+.planet-glow.amber-400 { background: #f59e0b; }
+.planet-glow.yellow-300 { background: #fde047; }
+.planet-glow.cyan-400 { background: #22d3ee; }
+.planet-glow.blue-500 { background: #3b82f6; }
+
+.planet-sphere {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  position: relative;
+  z-index: 1;
+  box-shadow: 
+    inset -20px -20px 40px rgba(0, 0, 0, 0.5),
+    inset 10px 10px 30px rgba(255, 255, 255, 0.1);
+}
+
+.planet-sphere.orange-400 { background: radial-gradient(circle at 30% 30%, #fdba74, #c2410c); }
+.planet-sphere.yellow-500 { background: radial-gradient(circle at 30% 30%, #fef08a, #a16207); }
+.planet-sphere.blue-400 { background: radial-gradient(circle at 30% 30%, #93c5fd, #1d4ed8); }
+.planet-sphere.red-500 { background: radial-gradient(circle at 30% 30%, #fca5a5, #991b1b); }
+.planet-sphere.amber-400 { background: radial-gradient(circle at 30% 30%, #fcd34d, #92400e); }
+.planet-sphere.yellow-300 { background: radial-gradient(circle at 30% 30%, #fef9c3, #a16207); }
+.planet-sphere.cyan-400 { background: radial-gradient(circle at 30% 30%, #a5f3fc, #0e7490); }
+.planet-sphere.blue-500 { background: radial-gradient(circle at 30% 30%, #93c5fd, #1e40af); }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+.planet-info h3 {
+  font-size: 1.8rem;
+  margin-bottom: 0.3rem;
+  color: var(--text-primary);
+}
+
+.planet-info h4 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: normal;
+  margin-bottom: 1rem;
+}
+
+.planet-info .description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.planet-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--neon-blue);
+}
