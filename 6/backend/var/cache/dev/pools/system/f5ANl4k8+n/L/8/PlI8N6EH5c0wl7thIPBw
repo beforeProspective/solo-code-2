@@ -1,0 +1,3 @@
+<?php //App%255CController%255CAdapterController%2523serializeAdapter
+
+return [PHP_INT_MAX, []];

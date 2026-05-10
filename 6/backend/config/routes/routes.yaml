@@ -1,0 +1,114 @@
+api_lenses:
+    path: /api/lenses
+    controller: App\Controller\LensController::index
+    methods: GET
+
+api_lenses_create:
+    path: /api/lenses
+    controller: App\Controller\LensController::create
+    methods: POST
+
+api_lenses_show:
+    path: /api/lenses/{id}
+    controller: App\Controller\LensController::show
+    methods: GET
+
+api_lenses_update:
+    path: /api/lenses/{id}
+    controller: App\Controller\LensController::update
+    methods: PUT
+
+api_lenses_delete:
+    path: /api/lenses/{id}
+    controller: App\Controller\LensController::delete
+    methods: DELETE
+
+api_adapters:
+    path: /api/adapters
+    controller: App\Controller\AdapterController::index
+    methods: GET
+
+api_adapters_create:
+    path: /api/adapters
+    controller: App\Controller\AdapterController::create
+    methods: POST
+
+api_adapters_show:
+    path: /api/adapters/{id}
+    controller: App\Controller\AdapterController::show
+    methods: GET
+
+api_adapters_update:
+    path: /api/adapters/{id}
+    controller: App\Controller\AdapterController::update
+    methods: PUT
+
+api_adapters_delete:
+    path: /api/adapters/{id}
+    controller: App\Controller\AdapterController::delete
+    methods: DELETE
+
+api_adapters_compatible:
+    path: /api/adapters/compatible
+    controller: App\Controller\AdapterController::findCompatible
+    methods: GET
+
+api_sample_photos:
+    path: /api/sample-photos
+    controller: App\Controller\SamplePhotoController::index
+    methods: GET
+
+api_sample_photos_create:
+    path: /api/sample-photos
+    controller: App\Controller\SamplePhotoController::create
+    methods: POST
+
+api_sample_photos_show:
+    path: /api/sample-photos/{id}
+    controller: App\Controller\SamplePhotoController::show
+    methods: GET
+
+api_sample_photos_update:
+    path: /api/sample-photos/{id}
+    controller: App\Controller\SamplePhotoController::update
+    methods: PUT
+
+api_sample_photos_delete:
+    path: /api/sample-photos/{id}
+    controller: App\Controller\SamplePhotoController::delete
+    methods: DELETE
+
+api_maintenance_records:
+    path: /api/maintenance-records
+    controller: App\Controller\MaintenanceRecordController::index
+    methods: GET
+
+api_maintenance_records_create:
+    path: /api/maintenance-records
+    controller: App\Controller\MaintenanceRecordController::create
+    methods: POST
+
+api_maintenance_records_show:
+    path: /api/maintenance-records/{id}
+    controller: App\Controller\MaintenanceRecordController::show
+    methods: GET
+
+api_maintenance_records_update:
+    path: /api/maintenance-records/{id}
+    controller: App\Controller\MaintenanceRecordController::update
+    methods: PUT
+
+api_maintenance_records_delete:
+    path: /api/maintenance-records/{id}
+    controller: App\Controller\MaintenanceRecordController::delete
+    methods: DELETE
+
+api_maintenance_records_overdue:
+    path: /api/maintenance-records/overdue
+    controller: App\Controller\MaintenanceRecordController::getOverdue
+    methods: GET
+
+api_maintenance_records_reminders:
+    path: /api/maintenance-records/reminders
+    controller: App\Controller\MaintenanceRecordController::getReminders
+    methods: GET
