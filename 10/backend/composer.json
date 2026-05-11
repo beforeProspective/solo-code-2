@@ -1,0 +1,24 @@
+{
+    "name": "electronic-components/backend",
+    "description": "Electronic Components Management System Backend",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "slim/slim": "^4.14",
+        "slim/psr7": "^1.7",
+        "php-di/slim-bridge": "^3.4",
+        "firebase/php-jwt": "^6.10",
+        "vlucas/phpdotenv": "^5.6",
+        "tuupola/cors-middleware": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "scripts": {
+        "start": "php -S localhost:8000 -t public",
+        "install-db": "php scripts/init_db.php"
+    }
+}
