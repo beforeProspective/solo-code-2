@@ -1,0 +1,412 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.closeButton {
+  width: 32px;
+  height: 32px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: background-color 0.15s;
+}
+
+.closeButton:hover {
+  background: #e5e7eb;
+}
+
+.form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.input {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+}
+
+.textarea {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: white;
+  flex: 1;
+  transition: border-color 0.2s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.inputGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.inputGroup .input,
+.inputGroup .select {
+  flex: 1;
+}
+
+.smallButton {
+  padding: 0.75rem 1rem;
+  background: #667eea;
+  color: white;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.smallButton:hover {
+  background: #5a67d8;
+}
+
+.smallButtonSecondary {
+  padding: 0.75rem 1rem;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.smallButtonSecondary:hover {
+  background: #e5e7eb;
+}
+
+.help {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background: #eef2ff;
+  color: #667eea;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.removeTag {
+  background: transparent;
+  color: #667eea;
+  font-size: 0.7rem;
+  padding: 0.125rem;
+  border-radius: 50%;
+  transition: background-color 0.15s;
+}
+
+.removeTag:hover {
+  background: #c7d2fe;
+}
+
+.tabs {
+  display: flex;
+  margin: 1rem 1.5rem 0;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6b7280;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.tabActive {
+  background: white;
+  color: #1a1a2e;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.importExportContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dropZone {
+  position: relative;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.dropZone:hover {
+  border-color: #667eea;
+  background: #fafaff;
+}
+
+.fileInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dropZoneContent {
+  pointer-events: none;
+}
+
+.dropZoneIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.dropZoneText {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.dropZoneHint {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.exportInfo {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.exportIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.exportText {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.exportHint {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.success {
+  padding: 0.75rem 1rem;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.error {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.loading {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.info {
+  padding: 0.75rem 1rem;
+  background: #f0f9ff;
+  color: #0369a1;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.buttonPrimary {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.buttonPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonSecondary {
+  padding: 0.75rem 1.5rem;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background-color 0.15s;
+}
+
+.buttonSecondary:hover {
+  background: #e5e7eb;
+}
+
+.successContent {
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.successIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.successTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 1.5rem;
+}
+
+.shareInfo {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.shareLabel {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.shareLink {
+  display: flex;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.shareLink span {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
