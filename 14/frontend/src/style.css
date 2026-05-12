@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+.v-toolbar-title {
+  font-weight: 600;
+}
+
+.event-card {
+  transition: transform 0.2s;
+}
+
+.event-card:hover {
+  transform: translateY(-4px);
+}
+
+.status-pending { color: #FB8C00; }
+.status-confirmed { color: #4CAF50; }
+.status-cancelled { color: #FF5252; }
+.status-refunded { color: #9E9E9E; }
