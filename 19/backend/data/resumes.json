@@ -1,0 +1,312 @@
+[
+  {
+    "id": "4f092bb4-921f-4250-8095-4cb7ea866add",
+    "title": "我的简历",
+    "personalInfo": {
+      "name": "张三1",
+      "title": "高级前端工程师",
+      "email": "zhangsan@example.com",
+      "phone": "138-0000-0000",
+      "location": "北京市",
+      "summary": "拥有5年以上前端开发经验，精通React、Vue等现代前端框架，对用户体验和性能优化有深入研究。",
+      "linkedin": "linkedin.com/in/zhangsan",
+      "github": "github.com/zhangsan",
+      "website": "zhangsan.dev"
+    },
+    "experience": [
+      {
+        "id": "kwh9ppf",
+        "company": "某科技有限公司",
+        "position": "高级前端工程师",
+        "startDate": "2021-01",
+        "endDate": "至今",
+        "description": "负责公司核心产品的前端架构设计与开发，带领5人团队完成多个重要项目，性能优化提升40%。"
+      },
+      {
+        "id": "7qii3mf",
+        "company": "某互联网公司",
+        "position": "前端开发工程师",
+        "startDate": "2018-06",
+        "endDate": "2020-12",
+        "description": "参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。"
+      },
+      {
+        "id": "ilm3s5d",
+        "company": "asd",
+        "position": "asd",
+        "startDate": "asdasd",
+        "endDate": "asdasd",
+        "description": "asdasdasdasd"
+      }
+    ],
+    "education": [
+      {
+        "id": "qocemlc",
+        "school": "北京大学",
+        "degree": "硕士",
+        "field": "计算机科学与技术",
+        "startDate": "2016-09",
+        "endDate": "2018-06"
+      },
+      {
+        "id": "p0a2mlt",
+        "school": "清华大学",
+        "degree": "学士",
+        "field": "软件工程",
+        "startDate": "2012-09",
+        "endDate": "2016-06"
+      }
+    ],
+    "skills": [
+      {
+        "id": "2t2vkqt",
+        "name": "React",
+        "level": "精通"
+      },
+      {
+        "id": "tkdn653",
+        "name": "TypeScript",
+        "level": "精通"
+      },
+      {
+        "id": "qb0eatv",
+        "name": "Vue.js",
+        "level": "熟练"
+      },
+      {
+        "id": "2mdjl39",
+        "name": "Node.js",
+        "level": "熟练"
+      },
+      {
+        "id": "psarg1w",
+        "name": "Webpack",
+        "level": "熟练"
+      },
+      {
+        "id": "czzy0wn",
+        "name": "php",
+        "level": "了解"
+      }
+    ],
+    "projects": [
+      {
+        "id": "6runjph",
+        "name": "企业级管理后台",
+        "description": "基于React+TypeScript构建的企业级管理系统，支持权限管理、数据可视化等功能。",
+        "technologies": "React, TypeScript, Ant Design, ECharts",
+        "link": "github.com/zhangsan/admin-dashboard"
+      }
+    ],
+    "template": "creative",
+    "primaryColor": "#10b981",
+    "createdAt": "2026-05-16T12:43:54.918Z",
+    "updatedAt": "2026-05-16T13:03:13.722Z"
+  },
+  {
+    "id": "cc2d5227-49fb-476c-a63f-0de0a8ce0dfe",
+    "title": "我的简历",
+    "personalInfo": {
+      "name": "张三",
+      "title": "高级前端工程师",
+      "email": "zhangsan@example.com",
+      "phone": "138-0000-0000",
+      "location": "北京市",
+      "summary": "拥有5年以上前端开发经验，精通React、Vue等现代前端框架，对用户体验和性能优化有深入研究。",
+      "linkedin": "linkedin.com/in/zhangsan",
+      "github": "github.com/zhangsan",
+      "website": "zhangsan.dev"
+    },
+    "experience": [
+      {
+        "id": "3a4fbyp",
+        "company": "某科技有限公司",
+        "position": "高级前端工程师",
+        "startDate": "2021-01",
+        "endDate": "至今",
+        "description": "负责公司核心产品的前端架构设计与开发，带领5人团队完成多个重要项目，性能优化提升40%。"
+      },
+      {
+        "id": "k8se19q",
+        "company": "某互联网公司",
+        "position": "前端开发工程师",
+        "startDate": "2018-06",
+        "endDate": "2020-12",
+        "description": "参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。"
+      }
+    ],
+    "education": [
+      {
+        "id": "xk31lkq",
+        "school": "北京大学",
+        "degree": "硕士",
+        "field": "计算机科学与技术",
+        "startDate": "2016-09",
+        "endDate": "2018-06"
+      },
+      {
+        "id": "7ltivpi",
+        "school": "清华大学",
+        "degree": "学士",
+        "field": "软件工程",
+        "startDate": "2012-09",
+        "endDate": "2016-06"
+      }
+    ],
+    "skills": [
+      {
+        "id": "0pco07a",
+        "name": "React",
+        "level": "精通"
+      },
+      {
+        "id": "atmdti7",
+        "name": "TypeScript",
+        "level": "精通"
+      },
+      {
+        "id": "hiodxks",
+        "name": "Vue.js",
+        "level": "熟练"
+      },
+      {
+        "id": "nlrr8nw",
+        "name": "Node.js",
+        "level": "熟练"
+      },
+      {
+        "id": "4yxisj7",
+        "name": "Webpack",
+        "level": "熟练"
+      }
+    ],
+    "projects": [
+      {
+        "id": "h5va5lh",
+        "name": "企业级管理后台",
+        "description": "基于React+TypeScript构建的企业级管理系统，支持权限管理、数据可视化等功能。",
+        "technologies": "React, TypeScript, Ant Design, ECharts",
+        "link": "github.com/zhangsan/admin-dashboard"
+      }
+    ],
+    "template": "modern",
+    "primaryColor": "#3b82f6",
+    "createdAt": "2026-05-16T13:13:55.903Z",
+    "updatedAt": "2026-05-16T13:13:55.903Z"
+  },
+  {
+    "id": "3b0e6b80-3dd2-452a-be63-bb1ffc9e7672",
+    "title": "我的简历",
+    "personalInfo": {
+      "name": "张三",
+      "title": "高级前端工程师",
+      "email": "zhangsan@example.com",
+      "phone": "138-0000-0000",
+      "location": "北京市",
+      "summary": "拥有5年以上前端开发经验，精通React、Vue等现代前端框架，对用户体验和性能优化有深入研究。",
+      "linkedin": "linkedin.com/in/zhangsan",
+      "github": "github.com/zhangsan",
+      "website": "zhangsan.dev"
+    },
+    "experience": [
+      {
+        "id": "vb55x59",
+        "company": "某科技有限公司",
+        "position": "高级前端工程师",
+        "startDate": "2021-01",
+        "endDate": "至今",
+        "description": "负责公司核心产品的前端架构设计与开发，带领5人团队完成多个重要项目，性能优化提升40%。"
+      },
+      {
+        "id": "2pzkccw",
+        "company": "某互联网公司",
+        "position": "前端开发工程师",
+        "startDate": "2018-06",
+        "endDate": "2020-12",
+        "description": "参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。"
+      },
+      {
+        "id": "ocrkb7h",
+        "company": "某互联网公司2",
+        "position": "前端开发工程师",
+        "startDate": "2018-06",
+        "endDate": "2020-12",
+        "description": "参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。"
+      },
+      {
+        "id": "kvv94gp",
+        "company": "某互联网公司3",
+        "position": "前端开发工程师",
+        "startDate": "2018-06",
+        "endDate": "2020-12",
+        "description": "参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。"
+      },
+      {
+        "id": "ec4ojjr",
+        "company": "某互联网公司4",
+        "position": "前端开发工程师",
+        "startDate": "2018-06",
+        "endDate": "2020-12",
+        "description": "参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。参与电商平台前端开发，独立完成购物车、订单系统等核心模块，日活用户超100万。"
+      }
+    ],
+    "education": [
+      {
+        "id": "m2o5o9c",
+        "school": "北京大学",
+        "degree": "硕士",
+        "field": "计算机科学与技术",
+        "startDate": "2016-09",
+        "endDate": "2018-06"
+      },
+      {
+        "id": "mmw3zb7",
+        "school": "清华大学",
+        "degree": "学士",
+        "field": "软件工程",
+        "startDate": "2012-09",
+        "endDate": "2016-06"
+      }
+    ],
+    "skills": [
+      {
+        "id": "ga4va6z",
+        "name": "React",
+        "level": "精通"
+      },
+      {
+        "id": "nq8yqc4",
+        "name": "TypeScript",
+        "level": "精通"
+      },
+      {
+        "id": "m2eu4cw",
+        "name": "Vue.js",
+        "level": "熟练"
+      },
+      {
+        "id": "aj096t5",
+        "name": "Node.js",
+        "level": "熟练"
+      },
+      {
+        "id": "m75xck8",
+        "name": "Webpack",
+        "level": "熟练"
+      }
+    ],
+    "projects": [
+      {
+        "id": "u07qxc7",
+        "name": "企业级管理后台",
+        "description": "基于React+TypeScript构建的企业级管理系统，支持权限管理、数据可视化等功能。",
+        "technologies": "React, TypeScript, Ant Design, ECharts",
+        "link": "github.com/zhangsan/admin-dashboard"
+      }
+    ],
+    "template": "modern",
+    "primaryColor": "#3b82f6",
+    "createdAt": "2026-05-16T13:33:10.488Z",
+    "updatedAt": "2026-05-16T13:33:10.488Z"
+  }
+]
