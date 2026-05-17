@@ -1,0 +1,75 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "$2a$10$Y9oKPCW2HSt1kbSKg4g4Y.DCo4SOihyrQrY03vHQn02Ai7IDZSmaq",
+      "role": "admin",
+      "created_at": "2026-05-17T12:23:58.136Z"
+    },
+    {
+      "id": 2,
+      "username": "user",
+      "password": "$2a$10$CE3faFcZOJS99yjujzNIaetzWs7IflThIk7heXQSU1NQ/sww3FkDS",
+      "role": "user",
+      "created_at": "2026-05-17T12:23:58.137Z"
+    }
+  ],
+  "feedbacks": [
+    {
+      "id": 1,
+      "title": "添加深色模式支持",
+      "description": "希望系统能够支持深色模式，在夜间使用时更加护眼。建议可以跟随系统设置自动切换。",
+      "author_id": 2,
+      "status": "planned",
+      "votes": 15,
+      "created_at": "2026-05-15T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "title": "支持导出反馈数据为Excel",
+      "description": "作为管理员，我希望能够将所有反馈数据导出为Excel格式，方便进行离线分析和汇报。",
+      "author_id": 1,
+      "status": "in-progress",
+      "votes": 8,
+      "created_at": "2026-05-16T09:00:00Z"
+    },
+    {
+      "id": 3,
+      "title": "增加评论功能",
+      "description": "希望能够对每个反馈进行评论讨论，方便用户之间交流想法和补充细节。",
+      "author_id": 2,
+      "status": "pending",
+      "votes": 23,
+      "created_at": "2026-05-17T08:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "支持按标签分类",
+      "description": "建议为反馈添加标签功能，如\"UI改进\"、\"性能优化\"、\"新功能\"等，便于分类管理。",
+      "author_id": 2,
+      "status": "completed",
+      "votes": 5,
+      "created_at": "2026-05-10T14:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "集成第三方登录",
+      "description": "希望支持微信、GitHub等第三方账号登录，减少用户注册成本。",
+      "author_id": 1,
+      "status": "rejected",
+      "votes": 3,
+      "created_at": "2026-05-12T11:00:00Z"
+    },
+    {
+      "id": 6,
+      "title": "测试新功能",
+      "description": "这是一个测试的新建议",
+      "author_id": 2,
+      "status": "pending",
+      "votes": 0,
+      "created_at": "2026-05-17T12:24:33.838Z"
+    }
+  ],
+  "votes": []
+}
