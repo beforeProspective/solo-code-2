@@ -1,0 +1,366 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
+use App\Models\Client;
+use App\Models\Department;
+use App\Models\Lead;
+use App\Models\Role;
+use App\Models\Setting;
+use App\Models\Status;
+use App\Models\Task;
+use App\Models\User;
+use App\Services\User\UserUpdateService;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use Ramsey\Uuid\Uuid;
+use Throwable;
+use Yajra\DataTables\Facades\DataTables;
+
+class UsersController extends Controller
+{
+    protected $users;
+
+    protected $roles;
+
+    public function __construct()
+    {
+        $this->middleware('user.create', ['only' => ['create']]);
+        $this->middleware('is.demo', ['only' => ['update', 'destroy']]);
+        $this->middleware(function ($request, $next) {
+            abort_unless(auth()->check() && auth()->user()->can('user-delete'), 403);
+
+            return $next($request);
+        }, ['only' => ['destroy']]);
+        $this->middleware('permission:user-update', ['only' => ['edit']]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function index()
+    {
+        return view('users.index')->withUsers(User::all());
+    }
+
+    public function calendarUsers()
+    {
+        if ( ! auth()->user()->can('absence-view')) {
+            session()->flash('flash_message_warning', __('You do not have permission to view this page'));
+
+            return redirect()->back();
+        }
+
+        return User::with(['department', 'absences' => function ($q) {
+            return $q->whereBetween('start_at', [today()->subWeeks(2)->startOfDay(), today()->addWeeks(4)->endOfDay()])
+                ->orWhereBetween('end_at', [today()->subWeeks(2)->startOfDay(), today()->addWeeks(4)->endOfDay()]);
+        },
+        ])->get();
+    }
+
+    public function users()
+    {
+        return User::with(['department'])->get();
+    }
+
+    public function anyData()
+    {
+        $users = User::query()->select(['id', 'external_id', 'name', 'email', 'primary_number']);
+
+        return Datatables::of($users)
+            ->addColumn('namelink', '<a href="{{ route("users.show",[$external_id]) }}">{{$name}}</a>')
+            ->addColumn('view', function ($user) {
+                return '<a href="' . route('users.show', $user->external_id) . '" class="btn btn-link">' . __('View') . '</a>';
+            })
+            ->addColumn('edit', function ($user) {
+                return '<a href="' . route('users.edit', $user->external_id) . '" class="btn btn-link">' . __('Edit') . '</a>';
+            })
+//            ->addColumn('delete', function ($user) {
+//                return '<button type="button" class="btn btn-link" data-client_id="' . $user->external_id . '" onClick="openModal(\'' . $user->external_id . '\')" id="myBtn">' . __('Delete') .'</button>';
+//            })
+            ->rawColumns(['namelink', 'view', 'edit', 'delete'])
+            ->make(true);
+    }
+
+    /**
+     * Json for Data tables.
+     *
+     * @return mixed
+     */
+    public function taskData($id)
+    {
+        $tasks = Task::with(['status', 'client.primaryContact'])->select(
+            ['id', 'external_id', 'title', 'created_at', 'deadline', 'user_assigned_id', 'client_id', 'status_id']
+        )
+            ->where('user_assigned_id', $id)->get();
+
+        return Datatables::of($tasks)
+            ->addColumn('titlelink', '<a href="{{ route("tasks.show",[$external_id]) }}">{{$title}}</a>')
+            ->editColumn('created_at', function ($tasks) {
+                return $tasks->created_at ? with(new Carbon($tasks->created_at))
+                    ->format(carbonDate()) : '';
+            })
+            ->editColumn('deadline', function ($tasks) {
+                return $tasks->deadline ? with(new Carbon($tasks->deadline))
+                    ->format(carbonDate()) : '';
+            })
+            ->editColumn('status_id', function ($tasks) {
+                return '<span class="label label-success" style="background-color:' . $tasks->status->color . '"> ' . $tasks->status->title . '</span>';
+            })
+            ->editColumn('client_id', function ($tasks) {
+                return $tasks->client->primaryContact->name;
+            })
+            ->rawColumns(['titlelink', 'status_id'])
+            ->make(true);
+    }
+
+    /**
+     * Json for Data tables.
+     *
+     * @return mixed
+     */
+    public function leadData($id)
+    {
+        $leads = Lead::with(['status', 'client.primaryContact'])->select(
+            ['id', 'external_id', 'title', 'created_at', 'deadline', 'user_assigned_id', 'client_id', 'status_id']
+        )
+            ->where('user_assigned_id', $id)->get();
+
+        return Datatables::of($leads)
+            ->addColumn('titlelink', '<a href="{{ route("leads.show",[$external_id]) }}">{{$title}}</a>')
+            ->editColumn('created_at', function ($leads) {
+                return $leads->created_at ? with(new Carbon($leads->created_at))
+                    ->format(carbonDate()) : '';
+            })
+            ->editColumn('deadline', function ($leads) {
+                return $leads->deadline ? with(new Carbon($leads->deadline))
+                    ->format(carbonDate()) : '';
+            })
+            ->editColumn('status_id', function ($leads) {
+                return '<span class="label label-success" style="background-color:' . $leads->status->color . '"> '
+                    . $leads->status->title . '</span>';
+            })
+            ->editColumn('client_id', function ($tasks) {
+                return $tasks->client->primaryContact->name;
+            })
+            ->rawColumns(['titlelink', 'status_id'])
+            ->make(true);
+    }
+
+    /**
+     * Json for Data tables.
+     *
+     * @return mixed
+     */
+    public function clientData($id)
+    {
+        $clients = Client::query()->select(['external_id', 'company_name', 'vat', 'address'])->where('user_id', $id);
+
+        return Datatables::of($clients)
+            ->addColumn('clientlink', function ($clients) {
+                return '<a href="' . route('clients.show', $clients->external_id) . '">' . $clients->company_name . '</a>';
+            })
+            ->editColumn('created_at', function ($clients) {
+                return $clients->created_at ? with(new Carbon($clients->created_at))
+                    ->format(carbonDate()) : '';
+            })
+            ->rawColumns(['clientlink'])
+            ->make(true);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function create()
+    {
+        return view('users.create')
+            ->withRoles($this->allRoles()->pluck('display_name', 'id'))
+            ->withDepartments(Department::query()->pluck('name', 'id'));
+    }
+
+    /**
+     * @param StoreUserRequest $userRequest
+     *
+     * @return mixed
+     */
+    public function store(StoreUserRequest $request)
+    {
+        $settings = Setting::first();
+        if (User::count() >= $settings->max_users) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => __('Max number of users reached')], 400);
+            }
+
+            Session::flash('flash_message_warning', __('Max number of users reached'));
+
+            return redirect()->back();
+        }
+        try {
+            $path = null;
+            if ($request->hasFile('image_path')) {
+                $file = $request->file('image_path');
+
+                $path = Storage::put($settings->external_id, $file);
+            }
+            DB::transaction(function () use ($request, $path) {
+                $user                   = new User();
+                $user->name             = $request->name;
+                $user->external_id      = Uuid::uuid4()->toString();
+                $user->email            = $request->email;
+                $user->address          = $request->address;
+                $user->primary_number   = $request->primary_number;
+                $user->secondary_number = $request->secondary_number;
+                $user->password         = bcrypt($request->password);
+                $user->image_path       = $path;
+                $user->language         = in_array($request->language, ['en', 'dk', 'es'], true) ? $request->language : 'en';
+                $user->save();
+                $user->roles()->attach($request->roles);
+                $user->department()->attach($request->departments);
+                $user->save();
+            });
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return $this->failureResponse(
+                $request,
+                __('User could not be created. Please try again.'),
+                'user'
+            );
+        }
+
+        Session::flash('flash_message', __('User successfully added'));
+
+        return redirect()->route('users.index');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function show($external_id)
+    {
+        /** @var User $user */
+        $user = $this->findByExternalId($external_id);
+
+        return view('users.show')
+            ->withUser($user)
+            ->withCompanyname(Setting::first()->company)
+            ->with('task_statistics', $user->totalOpenAndClosedTasks($external_id))
+            ->with('lead_statistics', $user->totalOpenAndClosedLeads($external_id))
+            ->with('lead_statuses', Status::typeOfLead()->get())
+            ->with('task_statuses', Status::typeOfTask()->get());
+    }
+
+    /**
+     * @return mixed
+     */
+    public function edit($external_id)
+    {
+        $user = $this->findByExternalId($external_id);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'user'        => $user->only(['id', 'name', 'email']),
+                'roles'       => $this->allRoles()->pluck('display_name', 'id'),
+                'departments' => Department::query()->pluck('name', 'id'),
+            ]);
+        }
+
+        return view('users.edit')
+            ->withUser($user)
+            ->withRoles($this->allRoles()->pluck('display_name', 'id'))
+            ->withDepartments(Department::query()->pluck('name', 'id'));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function update($external_id, UpdateUserRequest $request, UserUpdateService $userUpdateService)
+    {
+        $user       = $this->findByExternalId($external_id);
+        $validated  = $request->validated();
+        $role       = $validated['role'] ?? null;
+        $department = $validated['department'] ?? null;
+
+        $input = $userUpdateService->prepareValidatedInput(
+            auth()->user(),
+            $user,
+            $validated,
+            $request->file('image_path')
+        );
+
+        $user->fill($input)->save();
+
+        if ($role !== null || $department !== null) {
+            if ( ! $userUpdateService->syncRoleAndDepartment(auth()->user(), $user, (int) ($role ?? 0), (int) ($department ?? 0))) {
+                session()->flash('flash_message_warning', __('Not able to change owner role, please choose a new owner first'));
+            }
+        }
+
+        session()->flash('flash_message', __('User successfully updated'));
+
+        return redirect()->back();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function destroy(Request $request, $external_id)
+    {
+        $user = $this->findByExternalId($external_id);
+
+        if ($user->hasRole('owner')) {
+            session()->flash('flash_message_warning', __('Not allowed to delete super admin'));
+
+            return redirect()->back();
+        }
+
+        if ($request->tasks == 'move_all_tasks' && $request->task_user != '') {
+            $user->moveTasks($request->task_user);
+        }
+        if ($request->leads == 'move_all_leads' && $request->lead_user != '') {
+            $user->moveLeads($request->lead_user);
+        }
+        if ($request->clients == 'move_all_clients' && $request->client_user != '') {
+            $user->moveClients($request->client_user);
+        }
+
+        try {
+            $user->delete();
+            session()->flash('flash_message', __('User successfully deleted'));
+        } catch (QueryException $e) {
+            session()->flash('flash_message_warning', __('User can NOT have, leads, clients, or tasks assigned when deleted'));
+        }
+
+        return redirect()->route('users.index');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function findByExternalId($external_id)
+    {
+        return User::whereExternalId($external_id)->firstOrFail();
+    }
+
+    /**
+     * @return Collection|static[]
+     */
+    private function allRoles()
+    {
+        $role = auth()->user()->roles->first();
+        if ($role && $role->name == Role::OWNER_ROLE) {
+            return Role::all('display_name', 'id', 'name', 'external_id')->sortBy('display_name');
+        }
+
+        return Role::all('display_name', 'id', 'name', 'external_id')->filter(function ($value, $key) {
+            return $value->name != 'owner';
+        })->sortBy('display_name');
+    }
+}

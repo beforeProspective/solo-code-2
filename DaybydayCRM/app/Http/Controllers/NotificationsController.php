@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class NotificationsController extends Controller
+{
+    /**
+     * Mark a notification read.
+     *
+     * @return mixed
+     */
+    public function markRead(Request $request)
+    {
+        $user = auth()->user();
+        $user->unreadNotifications()->where('id', $request->id)->first()->markAsRead();
+
+        return redirect($user->notifications->where('id', $request->id)->first()->data['url']);
+    }
+
+    /**
+     * Mark all notifications as read.
+     *
+     * @return mixed
+     */
+    public function markAll()
+    {
+        $user = auth()->user();
+
+        if ( ! $user) {
+            abort(401, 'Unauthorized');
+        }
+
+        foreach ($user->unreadNotifications as $notification) {
+            $notification->markAsRead();
+        }
+
+        return redirect()->back();
+    }
+}

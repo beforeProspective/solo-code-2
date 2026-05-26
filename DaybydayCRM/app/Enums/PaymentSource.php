@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Enums;
+
+use Exception;
+use Illuminate\Validation\Rule;
+
+class PaymentSource
+{
+    private const BANK = 'bank';
+
+    private const CASH = 'cash';
+
+    private const INTERCOMPANY = 'intercompany'; // Mellemregning
+
+    private const EXPENSES = 'expenses'; // Udlæg
+
+    /**
+     * @var PaymentSource[]
+     */
+    private static $values = null;
+
+    /**
+     * @var string
+     */
+    private $source;
+
+    /**
+     * @var string
+     */
+    private $displayValue;
+
+    public function __construct(string $source, ?string $displayValue = null)
+    {
+        $this->source       = $source;
+        $this->displayValue = $displayValue;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->source;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function fromSource(string $source): self
+    {
+        foreach (self::values() as $paymentSource) {
+            if ($paymentSource->getSource() === $source) {
+                return $paymentSource;
+            }
+        }
+        throw new Exception('Unknown control status: ' . $source);
+    }
+
+    /**
+     * @param string $displayValue
+     *
+     * @return PaymentSource
+     *
+     * @throws Exception
+     */
+    public static function fromDisplayValue($displayValue)
+    {
+        foreach (self::values() as $paymentSource) {
+            if ($paymentSource->getDisplayValue() === $displayValue) {
+                return $paymentSource;
+            }
+        }
+        throw new Exception('Unknown control status display value: ' . $displayValue);
+    }
+
+    /**
+     * @return PaymentSource[]
+     */
+    public static function values(): array
+    {
+        if (null === self::$values) {
+            self::$values = [
+                self::BANK         => new self(self::BANK, 'Bank'),
+                self::CASH         => new self(self::CASH, 'Cash'),
+                self::EXPENSES     => new self(self::EXPENSES, 'Expenses'),
+                self::INTERCOMPANY => new self(self::INTERCOMPANY, 'Intercompany'),
+            ];
+        }
+
+        return self::$values;
+    }
+
+    public static function bank(): self
+    {
+        return self::values()[self::BANK];
+    }
+
+    public static function cash(): self
+    {
+        return self::values()[self::CASH];
+    }
+
+    public static function intercompany(): self
+    {
+        return self::values()[self::INTERCOMPANY];
+    }
+
+    public static function expenses(): self
+    {
+        return self::values()[self::EXPENSES];
+    }
+
+    public static function validationRules()
+    {
+        $values = array_column(self::values(), 'source');
+
+        return Rule::in($values);
+    }
+
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
+    public function getDisplayValue(): string
+    {
+        return $this->displayValue;
+    }
+}

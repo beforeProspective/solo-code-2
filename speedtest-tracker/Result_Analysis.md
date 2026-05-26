@@ -68,7 +68,9 @@ ResultResource 的字段构成分为两类来源：
 |------|---------|------|
 | 直接取属性 | `id`, `ping`, `download`, `upload`, `download_bytes`, `upload_bytes`, `healthy`, `status`, `scheduled`, `comments`, `data`, `created_at`, `updated_at` | `$this->属性名` |
 | `when()` 条件包装 | `download_bits`, `upload_bits`, `download_bits_human`, `upload_bits_human`, `download_bytes_human`, `upload_bytes_human` | `$this->when(条件, 回调)` |
-| 辅助方法/关系 | `service` (enum cast), `dispatched_by` (关系) | `$this->属性名` (依赖 casts/关系) |
+| 辅助方法/关系 | `service` (enum cast) | `$this->属性名` (依赖 casts) |
+
+> **关于 `dispatched_by` 的说明**：ResultResource 第37行写的是 `$this->dispatched_by`，这读取的是 **数据库外键列 `dispatched_by` 的原始值**（整数或 `null`），而不是 `dispatchedBy()` 关系方法。要触发关系方法返回 User 模型，需要写 `$this->dispatchedBy`（无下划线，camelCase）。
 
 ### 2.2 为什么需要 `when()` 包装？
 
@@ -86,7 +88,9 @@ ResultResource 的字段构成分为两类来源：
 
 | 字段 | 理由 |
 |------|------|
-| `id`, `service`, `status`, `healthy`, `scheduled`, `created_at`, `updated_at` | 这些列在数据库层面有 `NOT NULL` 约束或默认值，永远不会为空 |
+| `id`, `service`, `status`, `scheduled` | 这些列有 `NOT NULL` 约束或默认值，永远不会为空 |
+| `created_at`, `updated_at` | 由 `$table->timestamps()` 创建，**Eloquent 内置自动维护**（创建时写入、更新时刷新），实践中不会为空 |
+| `healthy` | 普通业务字段，迁移文件 `->nullable()` 无默认值，**Eloquent 不会自动维护**，需应用代码显式赋值，可能为 NULL |
 | `ping`, `download`, `upload`, `comments` | 这些是核心数据列，即使为 `null` 也有语义含义（如"测试未完成"），需要显式传递 |
 | `download_bytes`, `upload_bytes` | 2025 年新增列，可能为 `null`，但作为原始数据列需要显式展示 |
 | `data` | JSON 列，可能为 `null`，但作为完整原始数据需要暴露给 API |

@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Requests\Payment;
+
+use App\Enums\PaymentSource;
+use Illuminate\Foundation\Http\FormRequest;
+
+class PaymentRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return auth()->user()->can('payment-create');
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'amount'       => 'numeric|required|not_in:0',
+            'payment_date' => 'date|required',
+            'source'       => ['required', PaymentSource::validationRules()],
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'amount.integer'        => __('The amount must be an integer.'),
+            'amount.required'       => __('The amount is required.'),
+            'amount.not_in'         => __('The amount can not be 0.'),
+            'payment_date.date'     => __('The payment date is not a valid date.'),
+            'payment_date.required' => __('The payment date is required.'),
+            'source.required'       => __('The source is required.'),
+            'source.in'             => __('Invalid source'),
+        ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     * Normalize currency input by converting comma separators to dots.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        $mergedData = [];
+
+        if ($this->has('amount')) {
+            // Normalize currency: replace comma with dot for decimal separator
+            // Remove any spaces that might be present
+            $normalizedAmount = str_replace([',', ' '], ['.', ''], $this->amount);
+
+            $mergedData['amount'] = $normalizedAmount;
+        }
+
+        if ($this->has('source') && is_string($this->source)) {
+            $normalizedSource     = mb_strtolower(mb_trim($this->source));
+            $mergedData['source'] = match ($normalizedSource) {
+                'card', 'check' => PaymentSource::bank()->getSource(),
+                default         => $this->source,
+            };
+        }
+
+        if ($mergedData !== []) {
+            $this->merge($mergedData);
+        }
+    }
+}

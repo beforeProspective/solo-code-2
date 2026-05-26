@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\Project;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Queue\SerializesModels;
+
+class ProjectAction
+{
+    use InteractsWithSockets;
+    use SerializesModels;
+
+    private $project;
+
+    private $action;
+
+    /**
+     * Create a new event instance.
+     * projectAction constructor.
+     */
+    public function __construct(Project $project, $action)
+    {
+        $this->project = $project;
+        $this->action  = $action;
+    }
+
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return Channel|array
+     */
+    public function broadcastOn()
+    {
+        return new PrivateChannel('channel-name');
+    }
+}
