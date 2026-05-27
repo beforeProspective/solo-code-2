@@ -1,0 +1,84 @@
+{
+  "name": "angular-full-stack",
+  "version": "21.1.2",
+  "license": "MIT",
+  "author": "Davide Violante",
+  "description": "Angular Full Stack project built using Angular, Express, Mongoose and Node.",
+  "engines": {
+    "node": ">=24",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "ng": "ng",
+    "build:dev": "ng build -c development && tsc -p server",
+    "build:dev:w": "ng build -c development --watch",
+    "build": "ng build && tsc -p server",
+    "start": "node dist/server/app.js",
+    "predev": "tsc -p server",
+    "dev": "concurrently \"mongod\" \"ng serve --open\" \"tsc -w -p server\" \"nodemon dist/server/app.js\"",
+    "prod": "concurrently \"mongod\" \"ng build && tsc -p server && node dist/server/app.js\"",
+    "test": "ng test",
+    "test:be": "tsc -p server && jest",
+    "test:becov": "tsc -p server && jest --coverage",
+    "lint": "ng lint && htmlhint \"client/**/*.html\"",
+    "lint:fix": "ng lint --fix",
+    "prepare": "husky || true"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^21.1.2",
+    "@angular/compiler": "^21.1.2",
+    "@angular/core": "^21.1.2",
+    "@angular/forms": "^21.1.2",
+    "@angular/platform-browser": "^21.1.2",
+    "@angular/router": "^21.1.2",
+    "@auth0/angular-jwt": "^5.2.0",
+    "bcryptjs": "^2.4.3",
+    "bootstrap": "^5.3.8",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "font-awesome": "^4.7.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.16.0",
+    "morgan": "^1.10.1",
+    "rxjs": "~7.8.2",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.1.2",
+    "@angular/cli": "^21.1.2",
+    "@angular/compiler-cli": "^21.1.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24",
+    "@types/supertest": "^6.0.3",
+    "angular-eslint": "21.2.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.39.2",
+    "htmlhint": "^1.8.0",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "jsdom": "^27.1.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.6",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.54.0",
+    "vitest": "^4.0.8"
+  }
+}

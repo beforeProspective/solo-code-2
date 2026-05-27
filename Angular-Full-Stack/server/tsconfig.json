@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/server",
+    "baseUrl": "",
+    "module": "nodenext",
+    "types": ["node", "jest"],
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitOverride": false
+  },
+  "include": ["**/*.ts"]
+}
