@@ -1,0 +1,55 @@
+<main class="page">
+  <h2 class="mb-3 pb-2 text-center border-bottom">{{{t "views.home.about" }}}</h2>
+
+  {{#if instanceDescription}}
+  <div class="instance-description mb-4">
+    {{{instanceDescription}}}
+  </div>
+  {{/if}}
+
+  {{> instanceRules }}
+
+  <h2 class="mb-3 mt-5 pb-2 text-center border-bottom">{{t "views.home.aboutgathio"}}</h2>
+
+  <p class="lead text-center">{{t "views.home.intro"}}</p>
+
+  <div id="example-event" class="text-center w-100 mt-4 mb-5">
+    <img
+      alt="{{t "views.home.imgexample" }}"
+      src="images/example-event-2023.png" class="img-fluid w-75 mx-auto shadow-lg rounded">
+  </div>
+
+  <h3>{{t "views.home.privacytitle" }}</h3>
+
+  <p>{{t "views.home.privdesc" }} </p>
+
+  <p>{{t "views.home.privmail" }}</p>
+
+  <p>{{t "views.home.autodelete" }}</p>
+
+  <p>{{t "views.home.privacy" }} </p>
+
+  <p>{{t "views.home.attention" }} </p>
+
+  <h3>{{t "views.home.conftitle" }}</h3>
+
+  <p>{{{t "views.home.flagshipsetting" }}}</p>
+
+  <p>{{t "views.home.onpre" }}</p>
+
+  <h3>{{t "views.home.fedtitle" }}</h3>
+
+  <p>{{{t "views.home.selfhost" }}}</p>
+
+  <h3>{{t "views.home.opensource" }}</h3>
+
+  <p>{{{t "views.home.osdesc" }}}</p>
+
+  {{#if showKofi}}
+  <div class="card border-success mt-5 mb-3 mx-auto" style="min-width:300px;max-width:50%;">
+    <div class="card-body">
+      <p>{{{t "views.home.sponsor" }}}</p>
+    </div>
+  </div>
+  {{/if}}
+</main>

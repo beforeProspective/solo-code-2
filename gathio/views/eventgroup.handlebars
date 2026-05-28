@@ -1,0 +1,339 @@
+<main class="event">
+{{#if editingEnabled}}
+<div class="event__editing-banner">
+    {{ t "views.event.currentlyediting" }}
+</div>
+{{/if}}
+{{#if eventGroupHasCoverImage}}
+  <div class="event-header-image" id="eventImageContainer" style="background-image: url(/events/{{eventGroupData.image}});"></div>
+{{else}}
+  <div class="event-header-image" id="genericEventImageContainer" style="background-image: url(/images/seigaiha.png);"></div>
+{{/if}}
+<div class="row p-0">
+  <div class="col-lg">
+    <h3 id="eventGroupName" data-event-id="{{eventGroupData.id}}">{{eventGroupData.name}}</h3>
+  </div>
+  <div class="col-lg-2 ml-2 edit-buttons">
+    {{#if editingEnabled}}
+      <button type="button" id="editGroup" class="button button--primary text-nowrap ml-auto d-block" data-event-id="{{eventGroupData.id}}" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i> {{t "views.eventgroup.edit" }}</button>
+    {{/if}}
+  </div>
+</div>
+<div class="event-group">
+{{#if firstLoad}}
+<div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  {{{t "views.eventgroup.welcome" }}}
+</div>
+{{/if}}
+<div id="event__basics">
+  <div class="card" id="event__information">
+    <div class="card-body">
+      <ul class="fa-ul eventInformation">
+        {{#if eventGroupHasHost}}
+          <li id="hostName">
+            <span class="fa-li">
+              <i class="fas fa-fw fa-user-circle"></i>
+            </span>
+            <span class="text-muted">{{{t "views.eventgroup.hostedby" }}}
+          </li>
+        {{/if}}
+        {{#if eventGroupData.url}}
+          <li id="eventGroupURL">
+            <span class="fa-li">
+              <i class="fas fa-link"></i>
+            </span>
+            <a href="{{eventGroupData.url}}">
+              {{eventGroupData.url}}
+            </a>
+          </li>
+        {{/if}}
+        <li>
+          <span class="fa-li">
+            <i class="fas fa-users"></i>
+          </span>
+          <span class="text-muted">{{t "views.event.publiclink" }}:</span>
+          <a href="https://{{domain}}/group/{{eventGroupData.id}}">https://{{domain}}/group/{{eventGroupData.id}}</a>
+          <button type="button" id="copyEventLink" class="eventInformationAction button button--outline-secondary button--sm" data-clipboard-text="https://{{domain}}/group/{{eventGroupData.id}}">
+            <i class="fas fa-copy"></i> {{t "common.copy" }}
+          </button>
+        </li>
+        <li>
+          <span class="fa-li">
+            <i class="fas fa-rss"></i>
+          </span>
+          <a
+            href="https://{{domain}}/group/{{eventGroupData.id}}/feed.ics">https://{{domain}}/group/{{eventGroupData.id}}/feed.ics</a>&nbsp;
+          <button type="button" id="copyFeedLink"
+            class="eventInformationAction button button--outline-secondary button--sm"
+            data-clipboard-text="https://{{domain}}/group/{{eventGroupData.id}}/feed.ics">
+            <i class="fas fa-copy"></i> {{t "common.copy" }}
+          </button>
+          <p class="text-muted small">{{t "views.eventgroup.feedlinkdesc" }}</p>
+        </li>
+      </ul>
+    </div> <!-- /card -->
+  </div>
+  <aside id="event__actions">
+    <div class="button-stack" role="group" aria-label="Event group actions">
+      <button type="button" class="button button--outline-secondary button--sm"
+        data-event-id="{{eventGroupData.id}}" data-toggle="modal"
+        data-target="#subscribeModal">
+        <i class="fas fa-envelope"></i> {{t "views.eventgroup.subscribetitle" }}
+      </button>
+      <button type="button" id="exportICS" class="button button--outline-secondary
+        button--sm" data-event-id="{{eventGroupData.id}}">
+        <i class="fas fa-download"></i> {{t "views.eventgroup.ICSexport" }}
+      </button>
+    </div>
+
+    {{#unless editingEnabled}}
+        <button type="button" id="editGroup" class="button button--outline-secondary button--sm" data-event-id="{{eventGroupData.id}}" data-toggle="modal" data-target="#editTokenModal"><i class="fas fa-edit"></i> {{t "views.eventgroup.editmode" }}</button>
+    {{/unless}}
+  </aside>
+</div>
+
+{{#if editingEnabled}}
+  <div class="alert alert-info mb-4">
+    <p>{{t "views.eventgroup.addevent" }}</p>
+    <div class="table-responsive">
+      <table style="width:100%">
+        <tr style="border-bottom:1px solid rgba(0,0,0,0.2)">
+          <td><strong>{{t "common.eventgroupid" }}</strong></td>
+          <td><span class="code" id="eventGroupID">{{eventGroupData.id}}</span></td>
+        </tr>
+        <tr>
+          <td><strong>{{t "views.eventgroup.editpswd" }}</strong></td>
+          <td><span class="code" id="eventGroupEditToken">{{eventGroupData.editToken}}</span></td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+{{/if}}
+
+    <div class="card mb-4" id="eventDescription">
+        <h5 class="card-header">{{t "views.eventgroup.about" }}</h5>
+        <div class="card-body">
+            {{{parsedDescription}}}
+        </div>
+    </div>
+
+    <div class="card mt-4 mb-4" id="upcomingEvents">
+        <h5 class="card-header">{{t "views.eventgroup.upcomingevents" }}</h5>
+        {{> eventList upcomingEvents}}
+    </div>
+
+    <div class="card mt-4 mb-4" id="pastEvents">
+        <h5 class="card-header">{{t "views.eventgroup.pastevents" }}</h5>
+        {{> eventList pastEvents}}
+    </div>
+</div>
+
+{{#if editingEnabled}}
+{{> editeventgroupmodal }}
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">{{t "views.eventgroup.deletetitle" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="deleteEventGroupForm" action="/deleteeventgroup/{{eventGroupData.id}}/{{eventGroupData.editToken}}" method="post">
+      <div class="modal-body">
+        <p>{{t "views.eventgroup.delconfirm" }}</p>
+        <p>{{{t "views.eventgroup.deldesc" }}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button type="submit" class="button button--danger">{{t "views.eventgroup.del" }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{/if}}
+
+<div class="modal fade" id="subscribeModal" tabindex="-1" role="dialog"
+  aria-labelledby="subscribeModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="subscribeModalLabel">{{t "views.eventgroup.subscribe" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="subscribeForm" action="/subscribe/{{eventGroupData.id}}" method="post">
+      <div class="modal-body">
+        <div class="form-group">
+          <p class="form-text small">{{t "views.eventgroup.subscribedesc" }}</p>
+        </div>
+        <div class="form-group">
+          <input type="email" class="form-control" id="emailAddress"
+          name="emailAddress" placeholder="email@example.com" data-validation="required">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button type="submit" class="button button--primary">{{t "views.eventgroup.subscribebutton" }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editTokenModal" tabindex="-1" role="dialog" aria-labelledby="editTokenModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editTokenModalLabel">{{t "views.edittoken" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="verifyTokenForm" action="/verifytoken/group/{{eventGroupData.id}}" method="post">
+      <div class="modal-body">
+        <div class="form-group">
+          <p class="form-text small">{{t "views.edittokendesc" }}</p>
+          <div class="form-group">
+            <input type="text" class="form-control" id="editToken" name="editToken" placeholder="{{t "views.right" }}" data-validation="required">
+          </div>
+          <div class="form-group">
+              <div class="alert alert-danger" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button type="submit" class="button button--primary">{{t "views.eventgroup.edit" }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+window.groupData = {{{ json jsonData }}};
+</script>
+
+<script>
+  $(document).ready(function() {
+    // Save the editing token from the URL, if it is valid
+    const eventGroupID = window.groupData.id;
+    const url = new URL(window.location.href);
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('e')) {
+      $.ajax({
+        type: "POST",
+        url: `/verifytoken/group/${eventGroupID}`,
+        data: { editToken: urlParams.get('e') },
+        success: function(response, status, xhr) {
+          if (xhr.status === 200) {
+            addStoredToken(eventGroupID, urlParams.get('e'));
+          }
+        },
+        error: function(response, status, xhr) {
+          // The editing token is wrong - remove it
+          removeStoredToken(eventGroupID);
+          window.location = window.location.pathname;
+        }
+      });
+    } else if (getStoredToken(eventGroupID)) {
+      const editToken = getStoredToken(eventGroupID);
+      $.ajax({
+        type: "POST",
+        url: `/verifytoken/group/${eventGroupID}`,
+        data: { editToken },
+        success: function(response, status, xhr) {
+          if (xhr.status === 200) {
+            window.location.search = `?e=${editToken}`;
+          }
+        },
+        error: function(response, status, xhr) {
+          // The editing token is wrong - remove it
+          removeStoredToken(eventGroupID);
+        }
+      });
+    }
+
+    if (urlParams.has('show_edit')) {
+      $('#editModal').modal('show');
+      url.searchParams.delete('show_edit');
+      history.replaceState(history.state, '', url.href);
+    }
+
+    new ClipboardJS('#copyEventLink');
+    new ClipboardJS('#copyFeedLink');
+    autosize($('textarea'));
+    $("#exportICS").click(function(){
+      let eventGroupID = $(this).attr('data-event-id');
+      $.get('/export/group/' + eventGroupID, function(response) {
+        downloadFile(response, eventGroupID + '.ics');
+      })
+    })
+    $("#copyEventLink").click(function(){
+      $(this).html('<i class="fas fa-copy"></i> {{t "common.copied" }}!');
+      setTimeout(function(){ $("#copyEventLink").html('<i class="fas fa-copy"></i> {{t "common.copy" }}');}, 5000);
+    });
+    $("#copyFeedLink").click(function(){
+      $(this).html('<i class="fas fa-copy"></i> {{t "common.copied" }}');
+      setTimeout(function(){ $("#copyFeedLink").html('<i class="fas fa-copy"></i> {{t "common.copy" }}');}, 5000);
+    });
+
+      $('#verifyTokenForm').on('submit', function(e) {
+        e.preventDefault();
+        let form = $(this);
+        $.ajax({
+            type: "POST",
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response, status, xhr) {
+                if (xhr.status === 200) {
+                    // Save the token to localStorage for later
+                    addStoredToken($('#eventName').attr('data-event-id'), new FormData(form[0]).get('editToken'));
+                    window.location.search = `?e=${new FormData(form[0]).get('editToken')}&show_edit=true`;
+                }
+            },
+            error: function(response, status, xhr) {
+               form.find('.alert').text('{{t "views.incorrectpswd" }}').show();
+            }
+        });
+      });
+
+    $('#deleteEvent').on('click', function() {
+        $('#editModal').modal('hide');
+    })
+
+    // From https://davidwalsh.name/javascript-download
+    function downloadFile(data, fileName, type="text/calendar") {
+      // Create an invisible A element
+      const a = document.createElement("a");
+      a.style.display = "none";
+      document.body.appendChild(a);
+
+      // Set the HREF to a Blob representation of the data to be downloaded
+      a.href = window.URL.createObjectURL(
+        new Blob([data], { type })
+      );
+
+      // Use download attribute to set set desired file name
+      a.setAttribute("download", fileName);
+
+      // Trigger the download by simulating click
+      a.click();
+
+      // Cleanup
+      window.URL.revokeObjectURL(a.href);
+      document.body.removeChild(a);
+    }
+
+  });
+</script>
+</main>

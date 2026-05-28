@@ -1,0 +1,804 @@
+<main class="event{{#if editingEnabled}} event--editing{{/if}}">
+{{#if editingEnabled}}
+<div class="event__editing-banner">
+  {{t "views.event.currentlyediting" }}
+</div>
+{{/if}}
+{{#if eventHasCoverImage}}
+  <div class="event-header-image" id="eventImageContainer" style="background-image: url(/events/{{eventData.image}});"></div>
+{{else}}
+  <div class="event-header-image" id="genericEventImageContainer" style="background-image: url(/images/seigaiha.png);"></div>
+{{/if}}
+<div class="h-event">
+<div class="row p-0">
+  <div class="col-lg">
+      <h3 class="p-name" id="eventName" data-event-id="{{eventData.id}}">{{eventData.name}}</h3>
+  </div>
+  <div class="col-lg-4 ml-2 edit-buttons">
+    {{#if editingEnabled}}
+      <button type="button" id="editEvent" class="button button--primary ml-auto d-block" {{#if eventHasConcluded}}disabled{{/if}} data-event-id="{{eventData.id}}" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i> {{t "views.event.edit" }}</button>
+    {{/if}}
+  </div>
+</div>
+{{#if message}}
+<div class="alert alert-info mt-3 text-center" role="alert" id="event__message">
+    {{message}}
+</div>
+{{/if}}
+<div id="event__basics">
+  <div class="card" id="event__data">
+    <div class="card-body">
+      <ul class="fa-ul eventInformation">
+        <li>
+          <span class="fa-li">
+            <i class="fas fa-map-marker-alt"></i>
+          </span>
+          {{#if viewerApprovedForLocation}}
+            <span class="p-location">{{eventData.location}}</span>
+          {{else}}
+          <div class="hidden-section">
+            <span><i class="fas fa-lock"></i> {{t "views.event.location_hidden" }}</span>
+            <span class="small text-muted">{{t "views.event.location_hidden_desc" }}</span>
+          </div>
+          {{/if}}
+        </li>
+        <li>
+          <span class="fa-li">
+            <i class="fas fa-fw fa-calendar-day"></i>
+          </span>
+          <span class="dt-duration">{{{displayDate}}}</span>
+          <time class="dt-start" datetime="{{eventStartISO}}"></time>
+          <time class="dt-end" datetime="{{eventEndISO}}"></time>
+          <br>
+          <span class="text-muted">
+            {{#if eventHasBegun}}{{#unless eventHasConcluded}}{{t "views.event.started"}} {{else}}{{t "views.event.ended"}} {{/unless}}{{/if}}{{fromNow}}
+          </span>
+        </li>
+        {{#if eventHasHost}}
+          <li id="hosted-by">
+            <span class="fa-li">
+              <i class="fas fa-fw fa-user-circle"></i>
+            </span>
+            <span class="text-muted">{{{t "views.event.hostedby" }}}
+          </li>
+        {{/if}}
+        {{#if eventData.eventGroup}}
+          <li id="event-group">
+            <span class="fa-li">
+              <i class="fas fa-fw fa-calendar-alt"></i>
+            </span>
+            <span class="text-muted">{{{t "views.event.partof" }}}</span>
+          </li>
+        {{/if}}
+        {{#if eventData.url}}
+          <li>
+            <span class="fa-li">
+              <i class="fas fa-fw fa-link"></i>
+            </span>
+            <a href="{{eventData.url}}">
+              {{eventData.url}}
+            </a>
+          </li>
+        {{/if}}
+        <li>
+          <span class="fa-li">
+            <i class="fas fa-fw fa-users"></i>
+          </span>
+          <span class="text-muted">{{ t "views.event.publiclink" }}:</span>
+          <a class="u-url" href="https://{{domain}}/{{eventData.id}}">https://{{domain}}/{{eventData.id}}</a>
+          <button type="button" id="copyEventLink" class="eventInformationAction button button--outline-secondary button--sm" data-clipboard-text="https://{{domain}}/{{eventData.id}}">
+            <i class="fas fa-copy"></i> {{t "common.copy" }}
+          </button>
+        </li>
+        {{#if isFederated}}
+        <li>
+          <span class="fa-li fa-fw fediverse-icon"><img src="/images/fediverse-icon.svg" alt="Fediverse Icon" /></span>
+          <span class="text-muted">{{ t "views.event.fediverselink" }}:</span>
+          @{{eventData.id}}@{{domain}}
+          <button type="button" id="copyAPLink" class="eventInformationAction button button--outline-secondary button--sm" data-clipboard-text="@{{eventData.id}}@{{domain}}">
+            <i class="fas fa-copy"></i> {{t "common.copy" }}
+          </button>
+        </li>
+        {{/if}}
+      </ul>
+    </div> <!-- .card-body -->
+  </div> <!-- .card#event__data -->
+  
+  <aside id="event__actions">
+      <div class="button-stack" role="group" aria-label="Event actions">
+        <a href="http://www.google.com/calendar/event?action=TEMPLATE&dates={{parsedStart}}%2F{{parsedEnd}}&text={{escapedName}}&location={{calendarLocationParam}}&ctz={{timezone}}" class="button button--outline-secondary button--sm">
+          <i class="far fa-calendar-plus"></i> {{t "views.event.addtoGC" }}
+        </a>
+        <button type="button" id="exportICS" class="button button--outline-secondary button--sm" data-event-id="{{eventData.id}}">
+          <i class="fas fa-download"></i> {{t "views.event.ICSexport" }}
+        </button>
+        {{#if viewerApprovedForLocation}}
+          <a target="_blank" href="http://maps.google.com/?q={{parsedLocation}}" class="button button--outline-secondary button--sm" title="{{t "views.event.location_hidden" }}">
+            <i class="fas fa-map-marked"></i> {{t "views.event.showonGM" }}
+          </a>
+          <a target="_blank" href="https://www.openstreetmap.org/search?query={{parsedLocation}}" class="button button--outline-secondary button--sm" title="{{t "views.event.location_hidden" }}">
+            <i class="fas fa-map-marked"></i> {{t "views.event.showonOM" }}
+          </a>
+        {{/if}}
+      </div>
+
+    {{#unless editingEnabled}}
+        <button type="button" id="editEvent" class="button button--outline-secondary button--sm" {{#if eventHasConcluded}}disabled{{/if}} data-event-id="{{eventData.id}}" data-toggle="modal" data-target="#editTokenModal"><i class="fas fa-edit"></i> {{t "views.eventgroup.editmode" }}</button>
+    {{/unless}}
+  </aside> <!-- #event__actions -->
+</div>
+
+{{#if eventHasConcluded}}
+<div class="alert alert-warning mb-4" role="alert">
+{{t "views.event.concludeddel" }}</div>
+{{/if}}
+{{#if firstLoad}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <p>{{t "views.event.welcome" }}</p>
+  <p>{{{t "views.event.attention" }}}</p>
+  <p>{{{t "views.event.share" }}}</p>
+</div>
+{{/if}}
+<div class="card mb-4" id="eventDescription">
+  <h5 class="card-header">{{t "views.event.about" }}</h5>
+  <div class="card-body p-summary">
+    {{{parsedDescription}}}
+  </div>
+</div>
+
+{{#if eventData.usersCanAttend}}
+<div class="card mb-4" id="eventAttendees">
+  <h5 class="card-header">{{t "views.event.attendees" }} {{#if numberOfAttendees}}{{t "views.event.numberofattende" }}{{/if}}
+    <div class="button--group" role="group" aria-label="Attendance controls">
+      {{#unless noMoreSpots}}
+        <button type="button" id="attendEvent" class="button button--primary" data-event-id="{{eventData.id}}"><i class="fas fa-user-plus"></i> {{#if editingEnabled }}{{t "views.event.addattendee" }}{{else}}{{t "views.event.addme" }}{{/if}}</button>
+      {{/unless}}
+      {{#unless editingEnabled}}
+        <button type="button" id="unattendEvent" class="button button--secondary" data-toggle="modal" data-target="#unattendModal"><i class="fas fa-user-times"></i> {{t "views.event.removeme" }}</button>
+      {{/unless}}
+    </div>
+  </h5>
+  <div class="card-body text-center">
+    {{#if eventData.maxAttendees}}
+      {{#if noMoreSpots}}
+        <div class="alert alert-warning text-center" id="attendees-alert">{{t "views.event.capacity" }}</div>
+      {{else}}
+        <div class="alert alert-warning text-center" id="attendees-alert">{{plural "views.event.remaining" spotsRemaining }}</div>
+      {{/if}}
+    {{/if}}
+    {{#if numberOfAttendees}}
+      <ul class="attendeesList">
+        {{#each attendees}}
+          {{!-- Skip hidden attendees for non-editors --}}
+          {{#unless this.isHidden}}
+          <li data-attendee-name="{{this.name}}" data-attendee-id="{{this.id}}">
+            <span class="attendee-avatar" style="background-color: {{this.avatarColor}}">{{this.avatarLetter}}</span>
+            <span class="attendee-info">
+              <span class="attendee-name">{{this.name}}</span>
+              {{#if this.isPending}}
+                <span class="badge badge-warning">{{t "views.event.pending" }}</span>
+              {{/if}}
+            </span>
+            {{#if this.canRemove}}
+              <span class="attendee-actions">
+                {{#if this.canApprove}}
+                  <button type="button" class="button button--outline-secondary button--sm approve-attendee" data-event-id="{{../eventData.id}}" data-attendee-id="{{this.id}}" data-edit-token="{{../eventData.editToken}}" title="{{t "views.event.approveattendee" }}"><i class="fas fa-check"></i></button>
+                {{/if}}
+                {{#if this.canCopyLink}}
+                  <button type="button" class="button button--outline-secondary button--sm copy-attendee-link" data-event-id="{{../eventData.id}}" data-removal-password="{{this.removalPassword}}" title="{{t "views.event.copyattendeelink" }}"><i class="fas fa-link"></i></button>
+                {{/if}}
+                <button type="button" class="button button--outline-secondary button--sm remove-attendee" data-toggle="modal" data-target="#removeAttendeeModal" title="{{t "views.event.removeuser" }}"><i class="fas fa-user-times"></i></button>
+              </span>
+            {{/if}}
+          </li>
+          {{/unless}}
+          {{!-- Hidden attendees only shown to editors --}}
+          {{#if this.isHidden}}
+            {{#if this.canRemove}}
+            <li data-attendee-name="{{this.name}}" data-attendee-id="{{this.id}}" class="hidden-attendee">
+              <span class="attendee-avatar" style="background-color: {{this.avatarColor}}">{{this.avatarLetter}}</span>
+              <span class="attendee-info">
+                <span class="attendee-name">{{this.name}}</span>
+                <span class="text-muted">{{t "views.event.hidden" }}</span>
+                {{#if this.isPending}}
+                  <span class="badge badge-warning">{{t "views.event.pending" }}</span>
+                {{/if}}
+              </span>
+              <span class="attendee-actions">
+                {{#if this.canApprove}}
+                  <button type="button" class="button button--outline-secondary button--sm approve-attendee" data-event-id="{{../eventData.id}}" data-attendee-id="{{this.id}}" data-edit-token="{{../eventData.editToken}}" title="{{t "views.event.approveattendee" }}"><i class="fas fa-check"></i></button>
+                {{/if}}
+                {{#if this.canCopyLink}}
+                  <button type="button" class="button button--outline-secondary button--sm copy-attendee-link" data-event-id="{{../eventData.id}}" data-removal-password="{{this.removalPassword}}" title="{{t "views.event.copyattendeelink" }}"><i class="fas fa-link"></i></button>
+                {{/if}}
+                <button type="button" class="button button--outline-secondary button--sm remove-attendee" data-toggle="modal" data-target="#removeAttendeeModal" title="{{t "views.event.removeuser" }}"><i class="fas fa-user-times"></i></button>
+              </span>
+            </li>
+            {{/if}}
+          {{/if}}
+        {{/each}}
+        {{!-- Hidden attendees count shown to non-editors, but not to pending attendees --}}
+        {{#unless editingEnabled}}
+          {{#unless viewerRegisteredUnapproved}}
+            {{#if numberOfHiddenAttendees}}
+              <li class="hidden-attendees-item">
+                <span class="text-muted">{{plural "views.event.hiddenattendee" numberOfHiddenAttendees }}</span>
+              </li>
+            {{/if}}
+          {{/unless}}
+        {{/unless}}
+      </ul>
+      {{#if attendeesListHidden}}
+        <div class="hidden-section mt-3">
+          <span><i class="fas fa-lock"></i> {{t "views.event.attendees_hidden" }}</span>
+        </div>
+      {{/if}}
+    {{else}}
+      {{#if viewerApprovedForLocation}}
+        <p class="text-center text-muted mb-0">{{t "views.event.noattendees" }}</p>
+      {{else}}
+      <div class="hidden-section">
+        <span><i class="fas fa-lock"></i> {{t "views.event.attendees_hidden" }}</span>
+      </div>
+      {{/if}}
+    {{/if}}
+  </div>
+</div>
+
+<div class="modal fade" id="attendModal" tabindex="-1" role="dialog" aria-labelledby="attendModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="attendModalLabel">{{t "views.event.addself" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="attendEventForm" action="/event/{{eventData.id}}/attendee" method="post">
+        {{#if editingEnabled}}
+        <input type="hidden" name="editToken" value="{{eventData.editToken}}">
+        {{/if}}
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="attendeeName">{{t "views.event.attendeename" }}</label>
+        <div class="form-group">
+          <input type="text" class="form-control" id="attendeeName" name="attendeeName" placeholder="{{t "views.event.attendeenamedesc" }}" data-validation="required length" data-validation-length="1-30">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="attendeeNumber">{{t "views.event.attendeenum" }}</label>
+        <div class="form-group">
+          <input type="number" class="form-control" id="attendeeNumber" name="attendeeNumber" value="1" data-validation="required number" >
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="attendeeEmail">{{t "views.event.attendeeemail" }}</label>
+        <p class="form-text small">{{t "views.event.joinemaildesc" }}</p>
+        <div class="form-group">
+          <input type="email" class="form-control" id="attendeeEmail" name="attendeeEmail" placeholder="{{t "views.event.nospam" }}" data-validation="email" data-validation-optional="true">
+        </div>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="attendeeVisible" name="attendeeVisible" checked>
+        <label class="form-check-label" for="attendeeVisible">
+          {{t "views.event.attendeevisible" }}
+        </label>
+        <p class="form-text small">{{t "views.event.attendeevisibledesc" }}</p>
+      </div>
+      <div class="form-group">
+        <label for="removalPassword">{{t "views.event.removepswd" }}</label>
+        <p class="form-text small">{{{t "views.event.removepswddesc" }}}</p>
+        <input type="text" class="form-control" readonly id="removalPassword"
+        name="removalPassword">
+      </div>
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button type="submit" class="button button--primary">{{t "views.event.addmyself" }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="unattendModal" tabindex="-1" role="dialog" aria-labelledby="unattendModalLabel" aria-hidden="true" x-data="{ message: {}, password: new URLSearchParams(window.location.search).get('p') || '' }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="unattendModalLabel">{{{t "views.event.removemyselfdesc" }}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="unattendEventForm" x-on:submit.prevent="fetch(`/event/attendee/{{eventData.id}}?${new URLSearchParams({ p: password }).toString()}`, { method: 'DELETE' }).then(response => response.ok ? window.location.reload() : response.json()).then(data => message = data)">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="removalPassword" class="form-label">{{t "views.event.removepswd" }}</label>
+          <p class="form-text small">{{t "views.event.lostpswd" }}</p>
+          <div x-bind:class="{ 'alert-danger': message?.error, 'alert-success': message?.success }" class="alert" x-text="message?.error || message?.success" x-show="message?.error || message?.success"></div>
+          <input type="text" class="form-control" id="removalPassword" name="removalPassword" x-model="password" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button type="submit" class="button button--primary">{{t "views.event.removemyself" }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+  {{#if editingEnabled}}
+  <div class="modal fade" id="removeAttendeeModal" tabindex="-1" role="dialog" aria-labelledby="removeAttendeeModalLabel" aria-hidden="true" data-event-id="{{eventData.id}}" data-edit-token="{{eventData.editToken}}">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="removeAttendeeModalLabel">{{{t "views.event.removeattendeedesc" }}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{t "views.event.confremoveattendee" }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+          <button type="button" class="button button--danger" id="confirmRemoveAttendee">{{t "views.event.removeAttendee" }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+{{/if}}
+
+
+{{#if eventData.usersCanComment}}
+<div class="card mb-4" id="eventComments">
+  <h5 class="card-header">{{t "views.event.discussion" }}</h5>
+  <div class="card-body">
+    <form id="commentForm" action="/post/comment/{{eventData.id}}/" method="post">
+      <label for="commentAuthor">{{t "views.event.commentauthor" }}</label>
+      <div class="form-group">
+        <input type="text" class="form-control" id="commentAuthor" name="commentAuthor" placeholder="{{t "views.event.commentauthorph" }}" required>
+      </div>
+      <label for="commentContent">{{t "views.event.comment" }}</label>
+      <div class="form-group">
+        <div class="d-flex flex-gap">
+          <textarea class="form-control" id="commentContent" name="commentContent" style="resize: none;" placeholder="{{t "views.event.commentcontent" }}" maxlength="{{maxCommentLength}}" required></textarea>
+          <div class="input-group-append">
+            <button type="submit" class="button button--primary" id="postComment">{{t "views.event.postbutton" }} <i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+    {{#if eventData.comments}}
+      <hr style="border-style:dashed;">
+      <div class="container commentsList">
+      {{#each eventData.comments}}
+        <div class="comment">
+          <div class="row commentContainer">
+            <div class="col-lg commentText">
+              {{#if this.actorId}}
+                <p class="mb-0"><a href="{{this.actorId}}"><strong>{{this.author}}</strong></a> <a href="{{this.activityId}}"><small class="commentTimestamp text-muted">{{this.timestamp}}</small></a></p>
+              {{else}}
+                <p class="mb-0"><strong>{{this.author}}</strong> <small class="commentTimestamp text-muted">{{this.timestamp}}</small></p>
+              {{/if}}
+              <p>{{this.content}}</p>
+              {{#if this.replies}}
+                <hr>
+                <div class="repliesContainer">
+                  {{#each this.replies}}
+                    <p class="mb-0"><strong><i class="fas fa-reply text-muted"></i> {{this.author}}</strong> <small class="commentTimestamp text-muted">{{this.timestamp}}</small></p>
+                    <p>{{this.content}}</p>
+                  {{/each}}
+                </div>
+              {{/if}}
+            </div>
+            <div class="col-lg-3 commentMetadata text-right">
+              <button type="button" class="button button--outline button--sm openReplyBox">
+                <i class="fas fa-comment"></i> {{t "views.event.reply" }}
+              </button>
+              {{#if ../editingEnabled}}
+                <form class="d-inline" action="/deletecomment/{{../eventData.id}}/{{this._id}}/{{../eventData.editToken}}" method="post">
+                  <button type="submit" class="button button--outline button--sm deleteComment">
+                    <i class="fas fa-trash"></i> {{t "views.del" }}
+                  </button>
+                </form>
+              {{/if}}
+            </div>
+          </div>
+          <div class="row replyContainer">
+            <div class="col-md">
+              <form id="replyForm" action="/post/reply/{{../eventData.id}}/{{this._id}}" method="post">
+                <div class="form-group">
+                  <input type="text" class="form-control form-control-sm" id="replyAuthor" name="replyAuthor" placeholder="{{t "views.event.attendeename" }}" required>
+                </div>
+                <div class="form-group">
+                  <div class="d-flex flex-gap">
+                    <textarea class="form-control form-control-sm" id="replyContent" name="replyContent" style="resize: none;" placeholder="{{t "views.event.replycontent" }}" maxlength="{{maxCommentLength}}" required></textarea>
+                    <div class="input-group-append">
+                    </div>
+                      <button type="submit" class="button button--primary button--sm" id="postReply">{{t "views.event.reply" }} <i class="fas fa-chevron-right"></i></button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+      </div>
+    {{/if}}
+  </div>
+</div>
+{{/if}}
+
+<div class="modal fade" id="rsvpSuccessModal" tabindex="-1" role="dialog" aria-labelledby="rsvpSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rsvpSuccessModalLabel"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>{{t "views.event.saveyourlink" }}</strong>
+        </div>
+        <p id="rsvpModalDescription"></p>
+        <div class="form-group">
+          <label for="rsvpSecretLink">{{t "views.event.yoursecretlink" }}</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="rsvpSecretLink" readonly>
+            <div class="input-group-append">
+              <button class="button button--secondary" type="button" id="copyRsvpLink"><i class="fas fa-copy"></i> {{t "common.copy" }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--primary" data-dismiss="modal">{{t "views.event.savedlink" }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editTokenModal" tabindex="-1" role="dialog" aria-labelledby="editTokenModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editTokenModalLabel">{{t "views.edittoken" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="verifyTokenForm" action="/verifytoken/event/{{eventData.id}}" method="post">
+      <div class="modal-body">
+        <div class="form-group">
+          <p class="form-text small">{{t "views.edittokendesc" }}</p>
+          <div class="form-group">
+            <input type="text" class="form-control" id="editToken" name="editToken" placeholder="{{t "views.right" }}" data-validation="required">
+          </div>
+          <div class="form-group">
+              <div class="alert alert-danger" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button type="submit" class="button button--primary">{{t "views.event.edit" }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{#if editingEnabled}}
+{{#unless eventHasConcluded}}
+{{> editeventmodal }}
+{{/unless}}
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">{{t "views.event.deletetitle" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="deleteEventForm" action="/deleteevent/{{eventData.id}}/{{eventData.editToken}}" method="post">
+      <div class="modal-body">
+        <p>{{t "views.event.delconfirm" }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button type="submit" class="button button--danger">{{t "views.event.del" }}</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{/if}}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+window.eventData = {{{ json jsonData }}};
+</script>
+
+<script>
+  {{#if editingEnabled}}
+
+  $('#removeAttendeeModal').on('show.bs.modal', function (event) {
+    var listItem = $(event.relatedTarget).closest('li');
+    var attendeeName = listItem.data('attendee-name');
+    var attendeeID = listItem.data('attendee-id');
+    var modal = $(this);
+    modal.find('.modal-title').text('Remove ' + attendeeName + ' from {{eventData.name}}');
+    modal.data('attendee-id', attendeeID);
+  });
+
+  $('#confirmRemoveAttendee').on('click', function() {
+    var modal = $('#removeAttendeeModal');
+    var eventId = modal.data('event-id');
+    var editToken = modal.data('edit-token');
+    var attendeeId = modal.data('attendee-id');
+    fetch(`/event/${eventId}/attendee/${attendeeId}?e=${editToken}`, {
+      method: 'DELETE'
+    }).then(response => {
+      if (response.redirected) {
+        window.location.href = response.url;
+      } else if (response.ok) {
+        window.location.reload();
+      } else {
+        alert('Failed to remove attendee');
+      }
+    }).catch(err => {
+      console.error('Error removing attendee:', err);
+      alert('Failed to remove attendee');
+    });
+  });
+  {{/if}}
+  $(".commentTimestamp").html(function(){
+    parsedDate = moment($(this).html()).fromNow();
+    return parsedDate;
+  });
+  $(".openReplyBox").click(function(){
+//    let replyID = $(this).attr("data-id");
+    $(this).closest(".comment").find(".replyContainer").slideToggle();
+  });
+  $(document).ready(function() {
+    // Save the editing token from the URL, if it is valid
+    const eventID = $('#eventName').attr('data-event-id');
+    const url = new URL(window.location.href);
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('e')) {
+      $.ajax({
+        type: "POST",
+        url: `/verifytoken/event/${eventID}`,
+        data: { editToken: urlParams.get('e') },
+        success: function(response, status, xhr) {
+          if (xhr.status === 200) {
+            addStoredToken(eventID, urlParams.get('e'));
+          }
+        },
+        error: function(response, status, xhr) {
+          // The editing token is wrong - remove it
+          removeStoredToken(eventID);
+          // Remove the token from the URL
+          url.searchParams.delete('e');
+          window.location = url.href;
+        }
+      });
+    } else if (getStoredToken(eventID)) {
+      const editToken = getStoredToken(eventID);
+      $.ajax({
+        type: "POST",
+        url: `/verifytoken/event/${eventID}`,
+        data: { editToken },
+        success: function(response, status, xhr) {
+          if (xhr.status === 200) {
+            // Redirect to the same URL with the editing token in the URL
+            // We reload the page to force the server to load a page with
+            // the editing form accessible.
+            window.location.search = `?e=${editToken}`;
+          }
+        },
+        error: function(response, status, xhr) {
+          // The editing token is wrong - remove it
+          removeStoredToken(eventID);
+        }
+      });
+    }
+
+    if (urlParams.has('show_edit')) {
+      $('#editModal').modal('show');
+      url.searchParams.delete('show_edit');
+      history.replaceState(history.state, '', url.href);
+    }
+
+    if (urlParams.has('m')) {
+      const messageType = urlParams.get('m');
+      if (messageType === 'rsvppending') {
+        // Show the save link modal for pending RSVPs (approval-required events only)
+        const secretLink = window.location.origin + window.location.pathname + '?p=' + urlParams.get('p');
+        $('#rsvpSecretLink').val(secretLink);
+        $('#rsvpSuccessModalLabel').text("{{t 'views.event.rsvppending' }}");
+        $('#rsvpModalDescription').text("{{{t 'views.event.rsvppendingdesc' }}}");
+
+        $('#rsvpSuccessModal').modal('show');
+        new ClipboardJS('#copyRsvpLink', {
+          target: function() {
+            return document.getElementById('rsvpSecretLink');
+          }
+        });
+        $('#copyRsvpLink').on('click', function() {
+          $(this).html('<i class="fas fa-check"></i> {{t "common.copied" }}');
+          setTimeout(() => {
+            $(this).html('<i class="fas fa-copy"></i> {{t "common.copy" }}');
+          }, 3000);
+        });
+      }
+      url.searchParams.delete('m');
+      history.replaceState(history.state, '', url.href);
+    }
+
+    // From https://davidwalsh.name/javascript-download
+    function downloadFile(data, fileName, type="text/calendar") {
+      // Create an invisible A element
+      const a = document.createElement("a");
+      a.style.display = "none";
+      document.body.appendChild(a);
+
+      // Set the HREF to a Blob representation of the data to be downloaded
+      a.href = window.URL.createObjectURL(
+        new Blob([data], { type })
+      );
+
+      // Use download attribute to set set desired file name
+      a.setAttribute("download", fileName);
+
+      // Trigger the download by simulating click
+      a.click();
+
+      // Cleanup
+      window.URL.revokeObjectURL(a.href);
+      document.body.removeChild(a);
+    }
+
+    new ClipboardJS('#copyEventLink');
+    $("#exportICS").click(function(){
+      let eventID = $(this).attr('data-event-id');
+      $.get('/export/event/' + eventID, function(response) {
+        downloadFile(response, eventID + '.ics');
+      })
+    })
+    $("#copyEventLink").click(function(){
+      $(this).html('<i class="fas fa-copy"></i> {{t "common.copied" }}');
+      setTimeout(function(){ $("#copyEventLink").html('<i class="fas fa-copy"></i> {{t "common.copy" }}');}, 5000);
+    })
+    new ClipboardJS('#copyAPLink');
+    $("#copyAPLink").click(function(){
+      $(this).html('<i class="fas fa-copy"></i> {{t "common.copied" }}');
+      setTimeout(function(){ $("#copyAPLink").html('<i class="fas fa-copy"></i> {{t "common.copy" }}');}, 5000);
+    })
+    if ($("#joinCheckbox").is(':checked')){
+      $("#maxAttendeesCheckboxContainer").css("display","flex");
+    }
+    $('#attendEvent').on('click', function(event) {
+      const modal = $('#attendModal');
+      const eventID = $(this).attr('data-event-id');
+      axios.post('/attendee/provision', {}, { params: { eventID }})
+        .then((response) => {
+          modal.find('#removalPassword').val(response.data.removalPassword);
+          // Persist removal password locally for auto ?p injection
+          try {
+            const rpStore = JSON.parse(localStorage.getItem('gathioRemovalPasswords') || '{}');
+            rpStore[eventID] = response.data.removalPassword;
+            localStorage.setItem('gathioRemovalPasswords', JSON.stringify(rpStore));
+          } catch(e) { /* ignore persistence errors */ }
+          // If there is a limit on the number of attendees, the provisioned endpoint will return freeSpots;
+          // otherwise, freeSpots will be undefined.
+          if (response.data.freeSpots !== undefined) {
+            modal.find('#attendeeNumber')
+              .attr('data-validation-allowing', `range[1;${response.data.freeSpots}]`)
+              .attr('data-validation-error-msg', `{{t "views.event.numlimit" }}`);
+          }
+          modal.modal();
+        })
+        .catch((error) => {
+          console.error(error);
+          return false;
+        });
+    });
+
+      $('#verifyTokenForm').on('submit', function(e) {
+        e.preventDefault();
+        let form = $(this);
+        $.ajax({
+            type: "POST",
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response, status, xhr) {
+                if (xhr.status === 200) {
+                    // Save the token to localStorage for later
+                    addStoredToken($('#eventName').attr('data-event-id'), new FormData(form[0]).get('editToken'));
+                    window.location.search = `?e=${new FormData(form[0]).get('editToken')}&show_edit=true`;
+                }
+            },
+            error: function(response, status, xhr) {
+               form.find('.alert').text('{{t "views.incorrectpswd" }}').show();
+            }
+        });
+      });
+
+    $('#deleteEvent').on('click', function() {
+        $('#editModal').modal('hide');
+    });
+
+    // Auto-append ?p if stored and missing (not in editing mode)
+    (function autoAppendRemovalPassword(){
+      try {
+        const eventID = $('#eventName').attr('data-event-id');
+        if (!eventID) return;
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('e')) return; // host editing overrides
+        if (url.searchParams.get('p')) return; // already present
+        const rpStore = JSON.parse(localStorage.getItem('gathioRemovalPasswords') || '{}');
+        const rp = rpStore[eventID];
+        if (rp) {
+          url.searchParams.set('p', rp);
+          window.location.replace(url.href);
+        }
+      } catch(e) { /* ignore */ }
+    })();
+
+    // Approve attendee handler
+    $('.approve-attendee').on('click', function() {
+      const eventId = $(this).data('event-id');
+      const attendeeId = $(this).data('attendee-id');
+      const editToken = $(this).data('edit-token');
+      fetch(`/event/${eventId}/attendee/${attendeeId}?e=${editToken}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved: true })
+      }).then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else if (response.ok) {
+          window.location.reload();
+        } else {
+          alert('Failed to approve attendee');
+        }
+      }).catch(err => {
+        console.error('Error approving attendee:', err);
+        alert('Failed to approve attendee');
+      });
+    });
+
+    // Copy attendee link handler (for host to share with attendee)
+    $('.copy-attendee-link').on('click', function() {
+      const eventId = $(this).data('event-id');
+      const removalPassword = $(this).data('removal-password');
+      const link = window.location.origin + '/' + eventId + '?p=' + encodeURIComponent(removalPassword);
+      navigator.clipboard.writeText(link).then(() => {
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+        $btn.html('<i class="fas fa-check"></i>');
+        setTimeout(() => {
+          $btn.html(originalHtml);
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy link:', err);
+        prompt('Copy this link:', link);
+      });
+    });
+  });
+
+  </script>
+</main>

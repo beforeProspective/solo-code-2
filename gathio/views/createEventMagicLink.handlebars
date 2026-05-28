@@ -1,0 +1,29 @@
+<main class="page">
+  <h2 class="mb-4">{{t "views.createeventmagiclink.requestmltitle" }}</h2>
+
+  <form
+    action="/magic-link/event/create"
+    method="post"
+    hx-post="/magic-link/event/create"
+    hx-target="article"
+  >
+    <p>
+      {{t "views.createeventmagiclink.requestmldesc" }}
+    </p>
+    <p>
+      {{t "views.createeventmagiclink.requestmlcontact" }}
+    </p>
+    {{#if message}}
+      <div class="alert alert-{{message.type}}" role="alert">
+        {{message.text}}
+      </div>
+    {{/if}}
+    <div class="form-group">
+      <label for="email">{{t "common.emailaddr" }}</label>
+    <input type="email" class="form-control" id="email" placeholder="{{t "common.emailaddr" }}" required name="email">
+    </div>
+    <div class="form-group text-center">
+      <button type="submit" class="button button--primary w-50">{{t "routes.magiclink.requestmlbutton" }}</button>
+    </div>
+  </form>
+</main>

@@ -1,0 +1,76 @@
+<main class="page" x-data="{currentTab: null}">
+<h2 class="mb-3 pb-2 text-center border-bottom">{{t "views.newevent.pagetitle" }}</h2>
+<div class="container-fluid mb-4">
+  <div class="row">
+    <div class="col-lg-4 p-2">
+      <button type="button" id="showNewEventFormButton" class="button w-100" x-bind:class="currentTab === 'event' ? 'button--primary' : 'button--secondary'" x-on:click="currentTab = 'event'"><i class="fas fa-calendar-day"></i> {{t "views.newevent.neweventbutton" }}</button>
+    </div>
+    <div class="col-lg-4 p-2">
+      <button type="button" id="showImportEventFormButton" class="button w-100" x-bind:class="currentTab === 'importEvent' ? 'button--primary' : 'button--secondary'" x-on:click="currentTab = 'importEvent'"><i class="fas fa-file-import"></i> {{t "views.newevent.importevent" }}</button>
+    </div>
+    <div class="col-lg-4 p-2">
+      <button type="button" id="showNewEventGroupFormButton" class="button w-100" x-bind:class="currentTab === 'group' ? 'button--primary' : 'button--secondary'" x-on:click="currentTab = 'group'"><i class="fas fa-calendar-alt"></i> {{t "views.newevent.neweventgroup" }} </button>
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-info mb-4 text-center" role="alert">
+  <i class="fas fa-exclamation-circle"></i> {{{t "views.newevent.visiblealert" }}}
+</div>
+
+<div id="newEventFormContainer" x-show="currentTab === 'event'" style="display: none">
+  <h4 class="mb-2">{{t "views.newevent.createnew" }}</h4>
+  <form
+    id="newEventForm"
+    enctype="multipart/form-data"
+    x-data="newEventForm()"
+    x-init="init()"
+    @submit.prevent="submitForm"
+    @event-group-id-changed="data.eventGroupID = $event.detail"
+    @event-group-edit-token-changed="data.eventGroupEditToken = $event.detail"
+  >
+    {{>eventForm}}
+    <div class="form-group row">
+      <div class="col-sm-12 pt-3 pb-3 text-center">
+        <button
+          id="newEventFormSubmit"
+          type="submit"
+          class="button button--primary w-50"
+          x-bind:disabled="submitting"
+          x-bind:class="submitting ? 'button--loading' : ''"
+          x-text="submitting ? '{{t "common.creating" }}' : '{{t "common.create" }}'"
+        ></button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div id="importEventFormContainer" x-show="currentTab === 'importEvent'" style="display: none">
+  {{>importeventform}}
+</div>
+
+<div id="newEventGroupFormContainer" x-show="currentTab === 'group'" style="display: none">
+  <h4 class="mb-2">{{t "views.newevent.newgroup" }}</h4>
+  <p class="text-muted">{{t "views.newevent.groupdesc" }}</p>
+  <p class="text-muted">{{{t "views.newevent.groupattention" }}}</p>
+  <form id="newEventGroupForm" enctype="multipart/form-data" x-data="newEventGroupForm()" @submit.prevent="submitForm">
+    {{> eventGroupForm }}
+    <div class="form-group row">
+      <div class="col-sm-12 pt-3 pb-3 text-center">
+        <button
+          type="submit"
+          class="button button--primary w-50"
+          x-bind:disabled="submitting"
+          x-bind:class="submitting ? 'button--loading' : ''"
+          x-text="submitting ? '{{t "common.creating" }}' : '{{t "common.create" }}'"
+        ></button>
+      </div>
+    </div>
+  </form>
+</div>
+
+</main>
+
+<script src="/js/generate-timezones.js"></script>
+<script src="/js/modules/new.js"></script>
+<script src="/js/modules/group-linker.js"></script>

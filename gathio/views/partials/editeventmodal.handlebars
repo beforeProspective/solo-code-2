@@ -1,0 +1,61 @@
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true"
+  x-data="editEventForm()"
+  x-init="init()"
+  @event-group-id-changed="data.eventGroupID = $event.detail"
+  @event-group-edit-token-changed="data.eventGroupEditToken = $event.detail"
+>
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">{{{t "views.partials.editevent.edit" }}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editEventForm" enctype="multipart/form-data" @submit.prevent="submitForm">
+
+          {{> eventForm }}
+
+          <div class="form-group">
+            <div class="card border-danger mb-3">
+              <div class="card-header text-danger">{{t "views.partials.editevent.delthis" }}</div>
+              <div class="card-body text-danger">
+                <button type="button" id="deleteEvent" class="button button--danger" data-toggle="modal"
+                  data-target="#deleteModal" data-event-id="{{eventData.id}}"><i class="fas fa-trash"></i>
+                  {{t "views.del" }}</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="button button--secondary" data-dismiss="modal">{{t "common.close" }}</button>
+        <button
+          type="submit"
+          class="button button--primary"
+          @click="submitForm"
+          x-bind:disabled="submitting"
+          x-bind:class="submitting ? 'button--loading' : ''"
+          x-text="submitting ? '{{t "views.partials.saving" }}' : '{{t "views.partials.save" }}'"
+        ></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#deleteImage').click(function () {
+    $.post('/deleteimage/{{eventData.id}}/{{eventData.editToken}}', function (response) {
+      if (response === "Success") {
+        location.reload();
+      } else {
+        alert(response);
+      }
+    });
+  })
+</script>
+
+<script type="text/javascript" src="/js/generate-timezones.js"></script>
+<script type="text/javascript" src="/js/modules/event-edit.js"></script>
+<script src="/js/modules/group-linker.js"></script>
