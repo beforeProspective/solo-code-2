@@ -1,0 +1,178 @@
+{% extends 'admin_base.html' %}
+{% load i18n tz %}
+{% load general %}
+
+{% block actions %}
+{% include "_new_hire_settings_menu.html" %}
+{% endblock %}
+
+{% block content %}
+{% if object.missing_extra_info|length %}
+<div class="alert alert-warning">
+  <div class="row">
+    <div class="col-6" style="mt-2 mb-0">
+      <p class="mb-0 mt-2">{% translate "Some integrations require extra information. Make sure to complete those!" %}</p>
+    </div>
+    <div class="col-6" style="text-align:right">
+      <a href="{% url 'people:new_hire_extra_info' object.id %}" class="btn btn-primary">{% translate "Complete info" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% include "_new_hire_menu.html" %}
+<div class="row mt-3">
+  <div class="col-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{% translate "What's up next..." %}</h3>
+      </div>
+      <div class="card-body">
+        <ul class="timeline">
+          {# only show preboarding if before first day #}
+          {% if object.workday == 0 and object.preboarding.all|length %}
+            <li class="timeline-event">
+              <div class="timeline-event-icon">
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-stack-front"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" /><path d="M8 14l-4 2l8 4l8 -4l-4 -2" /><path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg>
+              </div>
+              <div class="timeline-event-card pt-0" style="margin-top: -5px">
+                <div class="card">
+                  <div class="card-header">
+                    <h4 class="card-title">{% translate "Before first day" %}</h4>
+                  </div>
+                  <div class="card-body">
+                    {% for preboard in object.preboarding.all %}
+                      <p class="text-muted" style="margin-bottom: 5px">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                           <line x1="9" y1="6" x2="20" y2="6"></line>
+                           <line x1="9" y1="12" x2="20" y2="12"></line>
+                           <line x1="9" y1="18" x2="20" y2="18"></line>
+                           <line x1="5" y1="6" x2="5" y2="6.01"></line>
+                           <line x1="5" y1="12" x2="5" y2="12.01"></line>
+                           <line x1="5" y1="18" x2="5" y2="18.01"></line>
+                        </svg>
+                        {{ preboard.name }}
+                      </p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% endif %}
+            {% for condition in conditions %}
+              {% show_highlighted_date_card conditions forloop.counter0 object.start_day as show_start %}
+              {% if show_start %}
+                <li class="timeline-event">
+                  <div class="timeline-event-icon">
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-player-play"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 4v16l13 -8z" /></svg>
+                  </div>
+                  <div class="timeline-event-card pt-0" style="margin-top: -5px">
+                    <div class="card">
+                      <div class="card-header">
+                        <h4 class="card-title">{% blocktranslate with start_day=object.start_day %}{{ start_day }} - New hire's first day!{% endblocktranslate %}</h4>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              {% endif %}
+              <li class="timeline-event">
+                <div class="timeline-event-icon">
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M13 18l6 -6" /><path d="M13 6l6 6" /></svg>
+                </div>
+                <div class="timeline-event-card pt-0" style="margin-top: -5px">
+                  <div class="card">
+                    <div class="card-header">
+                      {% if condition.condition_type == ConditionType.AFTER or condition.condition_type == ConditionType.BEFORE %}
+                      <h4 class="card-title">{{ condition|new_hire_trigger_date:object }} {% trans "at" %} {{ condition.time }}</h4>
+                      {% elif condition.condition_type == ConditionType.ADMIN_TASK %}
+                      <h4 class="card-title">
+                        {% trans "When these admin tasks are completed:" %}
+                        <div id="div_id_condition_to_do">
+                          {% for admin_to_do in condition.condition_admin_tasks.all %}
+                          <span class="badge {% if admin_to_do.id in completed_admin_tasks %}bg-green-lt{% else %}bg-blue-lt{% endif %} mt-1">{{ admin_to_do.name }}</span>
+                          {% endfor %}
+                        </div>
+                      </h4>
+                      {% elif condition.condition_type == ConditionType.TODO %}
+                      <h4 class="card-title">
+                        {% trans "When these tasks are completed:" %}
+                        <div id="div_id_condition_to_do">
+                          {% for to_do in condition.condition_to_do.all %}
+                          <span class="badge {% if to_do.id in completed_todos %}bg-green-lt{% else %}bg-blue-lt{% endif %} mt-1">{{ to_do.name }}</span>
+                          {% endfor %}
+                        </div>
+                      </h4>
+                      {% elif condition.condition_type == ConditionType.INTEGRATIONS_REVOKED %}
+                        {% blocktranslate %}When all access has been revoked{% endblocktranslate %}
+                      {% endif %}
+
+                    </div>
+                    <div class="card-body">
+                      {% include "_condition_body.html" with is_new_hire=True readonly=True %}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% empty %}
+              No items left!
+            {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{% translate "Latest activity..." %}</h3>
+      </div>
+      <div class="card-body">
+        <div class="divide-y" style="max-height: 500px; overflow-y: scroll; overflow-x: hidden;">
+          {% for notification in notifications %}
+            <div class="row">
+              <div class="col">
+                <div class="text-truncate">
+                  <strong>{{ notification.extra_text }}</strong>
+                  <div class="text-muted">
+                    {{ notification.get_notification_type_display }}
+                  </div>
+                </div>
+                <div class="text-truncate text-muted">{% translate "By" %}{% if notification.created_by %} {{ notification.created_by.full_name }}{% else %} ChiefOnboarding{% endif %} - {% timezone org.timezone %}{{ notification.created }}{% endtimezone %}</div>
+                {% if notification.can_delete %}
+                <form method="post" action="{% url 'people:remove_sequence' object.id notification.item_id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-danger mt-2" style="margin-right: 10px">Remove</a>
+                </form>
+                {% endif %}
+              </div>
+            </div>
+          {% empty %}
+            <div class="row">
+              <div class="col">
+                <div>{% translate "No items yet" %}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% if object.hardware.all %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h3 class="card-title">{% translate "Hardware" %}</h3>
+      </div>
+      <div class="list-group list-group-flush">
+        {% for hardware in object.hardware.all %}
+        <div class="list-group-item">
+          <div class="row align-items-center">
+            <div class="col text-truncate">
+              <span class="text-body d-block">{{ hardware.name }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

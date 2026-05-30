@@ -1,0 +1,23 @@
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% csrf_token %}
+
+{% if not form.error %}
+  {% if not form.fields|length %}
+    {% translate "No additional data needed." %}
+    <br>
+  {% endif %}
+  {% crispy form %}
+  <button type="submit" class="btn btn-primary">{% translate "Submit" %}</button>
+{% else %}
+  <h3>{% translate "Form couldn't be rendered because of an error" %}</h3>
+  <pre>
+    {{ form.error }}
+  </pre>
+{% endif %}
+
+
+{% if form.instance is not None %}
+{{ form.instance.content_json|json_script:"content_json" }}
+{% endif %}

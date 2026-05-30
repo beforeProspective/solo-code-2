@@ -1,0 +1,122 @@
+{% load general %}
+{% load settings_values %}
+{% aws_enabled as aws_active %}
+{% load i18n %}
+{% autoescape off %}
+{% with content=content|parse_to_json %}
+{% if content|has_form and not object.completed_form_items %}
+  {% if "preboarding" in request.path %}
+    <form hx-post="{% url 'new_hire:form' object.id 'preboarding' %}">
+  {% else %}
+    <form hx-post="{% url 'new_hire:form' object.id 'to_do' %}">
+  {% endif %}
+{% endif %}
+{% for block in content.blocks %}
+  {% if block.type == 'paragraph' %}
+    <p> {{ block.data.text|safe|personalize:user}} </p>
+  {% endif %}
+  {% if block.type == 'header' %}
+    <h{{block.data.level}}> {{ block.data.text|safe|personalize:user}} </h{{block.data.level}}>
+  {% endif %}
+  {% if block.type == 'quote' %}
+    <blockquote>{{ block.data.text|safe|personalize:user}}</blockquote>
+  {% endif %}
+  {% if block.type == 'list' %}
+    {% include "_render_list.html" with items=block.data.items blockstyle=block.data.style %}
+  {% endif %}
+  {% if block.type == 'embed' %}
+    {% if 'youtube' in block.data.embed  %}
+      <iframe width="560" height="315" src="{{ block.data.embed|safe|personalize:user }}" title="{{ block.data.height }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    {% elif 'vimeo' in block.data.embed  %}
+      <iframe src="{{ block.data.embed|safe|personalize:user }}" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    {% endif %}
+    <h3>{{ block.data.caption }}</h3>
+  {% endif %}
+  {% if block.type == 'attaches' %}
+    {% if block.data.file.ext == 'mp4' or block.data.file.ext == 'webm' %}
+      <video controls width="800" class="mt-2">
+          <source src="{{ block.data.file.url }}"
+                  type="video/{{ block.data.file.ext }}">
+          {% translate "Sorry, your browser doesn't support embedded videos." %}
+      </video>
+    {% else %}
+    <div class="d-block mt-2">
+      <a href="{{ block.data.file.url }}" type="button" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+           <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path>
+           <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path>
+        </svg>
+        {{ block.data.file.name }}
+      </a>
+    </div>
+    {% endif %}
+  {% endif %}
+  {% if block.type == 'image' %}
+    <div class="d-block mt-2">
+      <figure>
+        <img src="{{ block.data.file.url }}" alt="{{block.data.caption|personalize:user}}" />
+        <figcaption>{{block.data.caption|safe|personalize:user}}</figcaption>
+      </figure>
+    </div>
+  {% endif %}
+
+  {% if block.type == 'form' %}
+    {% if object.completed_form_items %}
+      {% if not content|next_still_form:forloop.counter0 %}
+      <p><b>{% translate "You have already completed this form" %}</b></p>
+      {% endif %}
+    {% else %}
+      {% if block.data.type == 'input' %}
+        <div class="mb-3">
+          <label class="form-label">{{ block.data.text|safe|personalize:user }}</label>
+          <input type="text" class="form-control" name="{{ block.id }}">
+        </div>
+      {% endif %}
+      {% if block.data.type == 'text' %}
+      <div class="mb-3">
+        <label class="form-label">{{ block.data.text|safe|personalize:user }}</label>
+        <textarea class="form-control" name="{{ block.id }}"></textarea>
+      </div>
+      {% endif %}
+      {% if block.data.type == 'check' %}
+      <div class="mb-3">
+        <label class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" name="{{ block.id }}">
+          <span class="form-check-label">{{ block.data.text|safe|personalize:user }}</span>
+        </label>
+      </div>
+      {% endif %}
+      {% if block.data.type == 'upload' %}
+      <div class="upload-field mb-1">
+        <label class="form-label custom-control-label">{{ block.data.text|safe|personalize:user }}</label>
+        {% if aws_active %}
+          <img src="{{ file.get_url }}" style="max-width: 100px; max-height: 100px;"/>
+          <input type="file" class="form-control d-none file-input">
+          <input class="file-id d-none" name="{{ block.id }}">
+
+          <a class="btn btn-sm btn-primary mb-3 upload-button">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+              <polyline points="7 9 12 4 17 9"></polyline>
+              <line x1="12" y1="4" x2="12" y2="16"></line>
+            </svg>
+            {% translate "Upload" %}
+          </a>
+        {% else %}
+          <div class="alert alert-warning" role="alert">
+            {% translate "File storage has not been set up. Please ask your supervisor." %}
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+{% if content|has_form and not object.completed_form_items %}
+  <button class="btn btn-primary mb-2" type="submit" style="float:unset; margin-left: 0px">{% translate "Submit" %}</button>
+  </form>
+{% endif %}
+{% endwith %}
+{% endautoescape %}

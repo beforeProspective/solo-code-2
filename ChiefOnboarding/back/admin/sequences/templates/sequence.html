@@ -1,0 +1,488 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block actions %}
+{% if object %}
+<form method="POST" action="{% url 'templates:duplicate_seq' object.id %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-primary">
+    {% translate "Duplicate" %}
+  </button>
+</form>
+<form method="POST" action="{% url 'sequences:delete' object.id %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">
+    {% translate "Delete" %}
+  </button>
+</form>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-7">
+    <div class="alert alert-warning" role="alert">
+      {% if sequence.is_onboarding %}
+        {% translate "All changes will be automatically saved. This doesn't impact current new hires." %}
+      {% else %}
+        {% translate "All changes will be automatically saved. This doesn't impact employees whom are currently being terminated." %}
+      {% endif %}
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex">
+          <label for="id_name" class="form-label requiredField">{% translate "Name" %}</label>
+        </div>
+        <div class="input-icon">
+          <input class="form-control d-inline-block w-9 me-3"
+                 id="name"
+                 value="{{ object.name }}"
+                 placeholder="Sequence name"
+                 name="name"
+                 hx-post="{% url 'sequences:update_name' object.id %}"
+                 hx-trigger="keyup delay:500ms changed"
+                 hx-indicator="#name-spinner"
+                 >
+                 <span class="input-icon-addon requesting" id="name-spinner">
+                   <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                 </span>
+        </div>
+        <div class="card-body" id="timeline" hx-trigger="reload-sequence from:body" hx-select="#timeline" hx-get="{% url 'sequences:update' object.id %}" hx-swap="outerHTML">
+          <ul class="timeline">
+            {# only show unconditioned #}
+            <li class="timeline-event">
+              <div class="timeline-event-icon">
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-stack-front"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" /><path d="M8 14l-4 2l8 4l8 -4l-4 -2" /><path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg>
+              </div>
+              {% for condition in conditions %}
+                {% if condition.condition_type == ConditionType.WITHOUT %}
+                <div class="timeline-event-card pt-0" style="margin-top: -5px" id="condition-{{condition.id}}">
+                  {% include '_sequence_condition.html' with condition=condition disable_delete=True %}
+                </div>
+                {% endif %}
+              {% endfor %}
+            </li>
+
+            {# before start day #}
+            {% for condition in conditions %}
+              {% if condition.condition_type == ConditionType.BEFORE %}
+                <li class="timeline-event">
+                  <div class="timeline-event-icon">
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+                  </div>
+                  <div class="timeline-event-card pt-0" style="margin-top: -5px" id="condition-{{condition.id}}">
+                    {% include '_sequence_condition.html' %}
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% for condition in conditions %}
+              {% if condition.condition_type == ConditionType.AFTER %}
+                <li class="timeline-event">
+                  <div class="timeline-event-icon">
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M13 18l6 -6" /><path d="M13 6l6 6" /></svg>
+                  </div>
+                  <div class="timeline-event-card pt-0" style="margin-top: -5px" id="condition-{{condition.id}}">
+                    {% include '_sequence_condition.html' %}
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% for condition in conditions %}
+              {% if condition.condition_type == ConditionType.TODO %}
+                <li class="timeline-event">
+                  <div class="timeline-event-icon">
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                  </div>
+                  <div class="timeline-event-card pt-0" style="margin-top: -5px" id="condition-{{condition.id}}">
+                    {% include '_sequence_condition.html' %}
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% for condition in conditions %}
+              {% if condition.condition_type == ConditionType.ADMIN_TASK %}
+                <li class="timeline-event">
+                  <div class="timeline-event-icon">
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                  </div>
+                  <div class="timeline-event-card pt-0" style="margin-top: -5px" id="condition-{{condition.id}}">
+                    {% include '_sequence_condition.html' %}
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% for condition in conditions %}
+              {% if condition.condition_type == ConditionType.INTEGRATIONS_REVOKED %}
+                <li class="timeline-event">
+                  <div class="timeline-event-icon">
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-bolt"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" /></svg>
+                  </div>
+                  <div class="timeline-event-card pt-0" style="margin-top: -5px" id="condition-{{condition.id}}">
+                    {% include '_sequence_condition.html' %}
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modal-block" hx-get="{% url 'sequences:condition-create' object.id %}" hx-target="#condition_form" hx-swap="#condition_form">
+          {% translate "Add block" %}
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-5">
+    <div class="card seq-icons sticky-top" id="template-list" style="max-height: calc(44rem + 10px)">
+      {% include '_sequence_templates_list.html' with active='todo' template='Todo' %}
+    </div>
+  </div>
+</div>
+
+<!-- modal for adding new block -->
+<div class="modal modal-blur fade show" id="modal-block" tabindex="-1" role="dialog" aria-modal="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{% translate "Block" %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="condition_form">
+        {% include "_condition_form.html" %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal for changing item in condition -->
+<div class="modal modal-blur fade show" id="modal-template-edit" tabindex="-1" role="dialog" aria-modal="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{% translate "Item" %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="form-modal-content">
+        <form id="form-add-item" method="post" action=".">
+          <div id="form">
+            <div class="text-center">
+              <div class="spinner-border" role="status"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_css %}
+<style>
+  #timeline .drop {
+    -webkit-transition: all 200ms ease;
+    -moz-transition: all 200ms ease;
+    -ms-transition: all 200ms ease;
+    -o-transition: all 200ms ease;
+    transition: all 200ms ease;
+  }
+  #timeline .drop.not_droppable { opacity: 0.5; }
+  #timeline .drop.droppable { box-shadow: rgba(35, 46, 60, 0.50) 0 2px 4px 0; }
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+var type = '';
+var item = '';
+var condition = '';
+var provisionCreated = '';
+function changeTemplate(itemId, conditionId, typeId, provCreated=0) {
+  $("#form").html('<div class="text-center"><div class="spinner-border" role="status"></div></div>')
+  type = typeId
+  item = itemId
+  condition = conditionId
+  provisionCreated = provCreated
+
+  $.ajax({
+    url: `/admin/sequences/{{object.id}}/forms/${typeId}/${itemId}/`,
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}'
+    }
+  }).done(function( data ) {
+    $("#form").html(data)
+    if (type === 'resource') {
+      initResource()
+    } else {
+      initWYSIWYGEditor()
+    }
+    initSelectize("#form-modal-content")
+    // Specific for Pending admin task
+    $("#div_id_slack_user").addClass("d-none")
+    $("#div_id_email").addClass("d-none")
+  });
+}
+// credits: https://stackoverflow.com/a/11339012
+function getFormData($form){
+  var unindexed_array = $form.serializeArray();
+  var indexed_array = {};
+
+  $.map(unindexed_array, function(n, i){
+      indexed_array[n['name']] = n['value'];
+  });
+
+  return indexed_array;
+}
+
+// Normally we would use `hx-post`, but for whatever reason, it won't always update the url
+// So this is a temporary workaround for that.
+// Nothing is as permanent as a temporary workaround.
+$("#form-add-item").submit(function (event) {
+    event.preventDefault();
+    if (type === 'integration' || type === 'integrationconfig') {
+      htmx.ajax('POST', `/admin/sequences/update_integration_config/${type}/${item}/${condition}/${provisionCreated}/`, {'values': getFormData($(this)), 'target': '#form'})
+    } else {
+      $.ajax({
+        url: `/admin/sequences/update_item/${type}/${item}/${condition}/`,
+        method: "post",
+        data: getFormData($(this)),
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      }).done(function( data, textStatus, request) {
+        if (request.getResponseHeader("HX-Trigger") !== null) {
+          htmx.trigger("#timeline", "reload-sequence");
+          return
+        }
+        $("#form").html(data)
+        if (type === 'resource') {
+          initResource()
+        } else {
+          initWYSIWYGEditor()
+        }
+        initSelectize("#form-modal-content")
+        // Specific for Pending admin task
+        $("#div_id_slack_user").addClass("d-none")
+        $("#div_id_email").addClass("d-none")
+      });
+    }
+})
+
+// close modals when we are reloading the sequence part
+$(document).on("reload-sequence", function(evt){
+  $('.modal').modal('hide')
+})
+
+function editCondition(id) {
+  htmx.ajax('GET', `/admin/sequences/{{ object.id }}/condition/${id}/`, `#condition_form`)
+  $('#modal-block').modal('show')
+}
+// reload selectboxes when we get a new form back from backend
+document.getElementById("condition_form").addEventListener('htmx:load', function(evt) {
+  $("#id_condition_to_do").selectize()
+  $("#id_condition_type").selectize()
+  $("#id_condition_admin_tasks").selectize()
+});
+</script>
+<script>
+// FOR APPOINTMENTS
+// Change when appointment date/time changes
+$(document).on('change', "#id_fixed_date", function() {
+  if (this.checked == true){
+    $("#div_id_date").parent().removeClass("d-none")
+    $("#div_id_on_day").parent().addClass("d-none")
+  } else {
+    $("#div_id_date").parent().addClass("d-none")
+    $("#div_id_on_day").parent().removeClass("d-none")
+  }
+})
+// FOR TODOS
+$(document).on('change', "#id_send_back", function() {
+  if (this.checked == true){
+    $(".slack_channel_dissapear").removeClass("d-none")
+  } else {
+    $(".slack_channel_dissapear").addClass("d-none")
+  }
+})
+
+// FOR PENDING ADMIN TASKS
+$(document).on('change', "select#id_option", function() {
+  // Change things to fill in when notification option changes
+  if ($(this).val() == 0){
+    $("#div_id_slack_user").addClass("d-none")
+    $("#div_id_email").addClass("d-none")
+  } else if ($(this).val() == 2){
+    $("#div_id_slack_user").removeClass("d-none")
+    $("#div_id_email").addClass("d-none")
+  } else {
+    $("#div_id_slack_user").addClass("d-none")
+    $("#div_id_email").removeClass("d-none")
+  }
+})
+$(document).on('change', "select#id_person_type", function() {
+  // Change things to fill in when condition_type changes
+  if ($(this).val() == 3){
+    $("#div_id_assigned_to").parent().removeClass("d-none")
+  } else {
+    $("#div_id_assigned_to").parent().addClass("d-none")
+  }
+})
+// FOR PENDING MESSAGES
+$(document).on('change', "select#id_person_type", function() {
+  if ($(this).val() == 3){
+    $("#div_id_send_to").parent().removeClass("d-none")
+  } else {
+    $("#div_id_send_to").parent().addClass("d-none")
+  }
+  if ($(this).val() == 4){
+    $("#div_id_send_to_channel").parent().removeClass("d-none")
+  } else {
+    $("#div_id_send_to_channel").parent().addClass("d-none")
+  }
+})
+</script>
+{% if DEBUG %}
+<script src="{% static 'js/vue.js' %}"></script>
+{% else %}
+<script src="{% static 'js/vue.min.js' %}"></script>
+{% endif %}
+<script>
+var placeholder = '{% translate "Start typing here..." %}';
+var newItemText = '{% translate "New item" %}';
+{% if sequence.is_onboarding %}
+var allowedBefore = ["pendingadmintask", "pendingemailmessage", "pendingslackmessage", "pendingtextmessage", "integration", "hardware"]
+var allowedAfter = ["pendingadmintask","appointment", "todo", "resource", "introduction", "badge", "pendingemailmessage", "pendingslackmessage", "pendingtextmessage", "integration", "hardware"]
+{% else %}
+var allowedBefore = ["pendingadmintask","appointment", "todo", "resource", "introduction", "badge", "pendingemailmessage", "pendingslackmessage", "pendingtextmessage", "integration", "hardware"]
+var allowedAfter = ["pendingadmintask", "pendingemailmessage", "pendingslackmessage", "pendingtextmessage", "integration", "hardware"]
+{% endif %}
+
+
+</script>
+<script src="{% static 'js/resources.js' %}"></script>
+<script>
+
+var dragged;
+var draggedToElement;
+
+const targetClassConditionsMap =
+{
+  before: (type) => allowedBefore.includes(type),
+  after: (type) => allowedAfter.includes(type),
+  unconditioned: (type) => true,
+  to_do: (type) => true
+};
+
+
+function isTypeAllowedAtTargetElement(type, targetElement) {
+  const $elem = $(targetElement);
+  const classes = $elem.attr("class").split(/\s+/);
+  var hasError = false;
+
+  $.each(targetClassConditionsMap, (property, validator) => {
+    if(classes.includes(property)) {
+      // Need to make a validation for this property, as it part of the classpath
+      if(!validator(type)) {
+        hasError = true;
+      }
+    }
+  });
+  return !hasError;
+}
+
+function markAsNotDroppable(element) {
+  $(element).addClass("not_droppable");
+}
+
+function markAsDroppable(element) {
+  $(element).addClass("droppable");
+}
+
+function removeDroppableClasses() {
+  $('#timeline .droppable, #timeline .not_droppable').removeClass('droppable not_droppable');
+}
+
+document.addEventListener("dragstart", function( event ) {
+  dragged = event.target;
+  event.target.style.opacity = .5;
+
+  $('#timeline .drop').each((index, element) => {
+    if(!isTypeAllowedAtTargetElement(dragged.dataset.type, element)) {
+      markAsNotDroppable(element);
+    } else {
+      markAsDroppable(element);
+    }
+  });
+}, false);
+
+document.addEventListener("drop", function( event ) {
+  // prevent default action
+  event.preventDefault();
+
+  const droppedPlace = event.target.closest(".drop")
+  draggedToElement = droppedPlace;
+
+  if (Boolean(droppedPlace)) {
+    const templateId = dragged.dataset.id;
+    const type = dragged.dataset.type;
+    const conditionID = droppedPlace.dataset.id
+
+    if (!isTypeAllowedAtTargetElement(type, droppedPlace)) {
+      return;
+    }
+
+    $(".card").css("background-color", "white")
+    if (templateId !== '0' && type !== 'integration') {
+      htmx.ajax('POST', `/admin/sequences/condition/${conditionID}/${type}/${templateId}/`, `#condition-${conditionID}`).then(() => {
+        initSelectize(`#condition-${conditionID}`)
+      });
+    } else {
+      changeTemplate(parseInt(templateId), conditionID, type)
+      $('#modal-template-edit').modal('show')
+    }
+  }
+}, false);
+
+document.addEventListener("dragover", function( event ) {
+  // prevent default action
+  event.preventDefault();
+  event.stopPropagation();
+  const droppedPlace = event.target.closest(".drop")
+  if (Boolean(droppedPlace)) {
+    const type = dragged.dataset.type;
+    if (isTypeAllowedAtTargetElement(type, droppedPlace)) {
+      droppedPlace.style.backgroundColor='rgb(239, 242, 246)';
+    }
+  }
+}, false);
+
+document.addEventListener("dragend", function( event ) {
+  removeDroppableClasses();
+  event.target.style.opacity = "";
+  if (typeof event.target.closest !== "function") {
+      return
+  }
+  if (Boolean(draggedToElement)) {
+    draggedToElement.style.backgroundColor='white';
+  }
+}, false);
+
+document.addEventListener("dragleave", function( event ) {
+  // prevent default action
+  event.preventDefault();
+  event.stopPropagation();
+  if (typeof event.target.closest !== "function") {
+      return
+  }
+  const droppedPlace = event.target.closest(".drop")
+  if (Boolean(droppedPlace)) {
+    const droppedPlace = event.target.closest(".drop")
+    droppedPlace.style.backgroundColor='white';
+  }
+}, false);
+</script>
+{% endblock %}

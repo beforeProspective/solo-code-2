@@ -1,0 +1,37 @@
+{
+  "name": "ChiefOnboarding",
+  "description": "Free and open-source employee onboarding platform. Onboard new hires through Slack or the web portal.",
+  "repository": "https://github.com/chiefonboarding/ChiefOnboarding",
+  "logo": "https://avatars.githubusercontent.com/u/29075722",
+  "keywords": ["python", "django", "employee", "onboarding", "slack"],
+  "website": "https://chiefonboarding.com/",
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "image": "heroku/python",
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "env": {
+    "SECRET_KEY": {
+      "description": "A random secret key for Django",
+      "generator": "secret"
+    },
+    "SSL_REDIRECT": {
+      "description": "Automatically redirect to HTTPS for a secure connection",
+      "value": "True"
+    },
+    "ALLOWED_HOSTS": {
+      "description": "This is the base url of your application. This can be a heroku url (xxxx.herokuapp.com - which matches your domain for this app) or your own (sub) domain. Format: test.chiefonboarding.com",
+      "required": true
+    }
+  }
+}
+

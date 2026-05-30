@@ -1,0 +1,31 @@
+{% extends 'admin_base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <form method="POST">
+        <div class="card-body">
+          {% crispy form %}
+          <p>{% translate "This will send an email or text message to your new hire providing them the link to use see their pre-boarding page. You can send a text message (if mobile number is provided) or an email. Make sure that you are sending the email to an email address that is accessible to them right now!" %}</p>
+          <div class="form-footer">
+            <button type="submit" class="btn btn-primary">{% translate "Send preboarding notification" %}</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+$("select#id_send_type").on('change', function() {
+  if ($(this).val() == 'text'){
+    $("#div_id_email").addClass("d-none")
+  } else {
+    $("#div_id_email").removeClass("d-none")
+  }
+})
+</script>
+{% endblock %}
